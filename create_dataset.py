@@ -2,37 +2,49 @@ import cv2
 import os
 
 def start_capture(name):
-        path = "./data/" + name
-        num_of_images = 0
-        detector = cv2.CascadeClassifier("./data/haarcascade_frontalface_default.xml")
-        try:
-            os.makedirs(path)
-        except:
-            print('Directory Already Created')
-        vid = cv2.VideoCapture(0)
-        while True:
+    face_classifier = cv2.CascadeClassifier("./data/haarcascade_frontalface_default.xml")
+    path = "./data/" + name
 
-            ret, img = vid.read()
-            new_img = None
-            grayimg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            face = detector.detectMultiScale(image=grayimg, scaleFactor=1.1, minNeighbors=5)
-            for x, y, w, h in face:
-                cv2.rectangle(img, (x, y), (x+w, y+h), (0, 0, 0), 2)
-                cv2.putText(img, "Face Detected", (x, y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255))
-                cv2.putText(img, str(str(num_of_images)+" images captured"), (x, y+h+20), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255))
-                new_img = img[y:y+h, x:x+w]
-            cv2.imshow("FaceDetection", img)
-            key = cv2.waitKey(1) & 0xFF
+    try:
+        os.makedirs(path)
+    except:
+        print('Directory Already Created')
+
+    def face_cropped(img):
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        faces = face_classifier.detectMultiScale(gray, 1.3, 5)
+        if faces is ():
+            return None
+        for (x, y, w, h) in faces:
+            cropped_face = img[y:y + h, x:x + w]
+            return cropped_face
+
+    cap = cv2.VideoCapture(0)
+    img_id = 0
+
+    while True:
+        ret, frame = cap.read()
+        cv2.imshow("real", frame)
+        if face_cropped(frame) is not None:
+            face = cv2.resize(face_cropped(frame), (200, 200))
+            face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
+            file_name_path = path+"/"+str(img_id)+name+".jpg"
+            cv2.imwrite(file_name_path, face)
+            cv2.putText(face, str(img_id), (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 2)
+            img_id += 1
+
+            cv2.imshow("Cropped_Face", face)
+        else:
+            print("hi")
+            # cv2.putText(frame, str("emty"), (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 2)
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord("q") or key == 27 or img_id > 999:
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+    print("Collecting samples is completed !!!")
+    return img_id
 
 
-            try :
-                cv2.imwrite(str(path+"/"+str(num_of_images)+name+".jpg"), new_img)
-                num_of_images += 1
-            except :
-
-                pass
-            if key == ord("q") or key == 27 or num_of_images > 310:
-                break
-        cv2.destroyAllWindows()
-        return num_of_images
-
+start_capture("phu")
