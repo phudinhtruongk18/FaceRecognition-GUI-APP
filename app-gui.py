@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import font as tkfont
 from tkinter import messagebox,PhotoImage
 #from PIL import ImageTk, Image
-#from gender_prediction import emotion,ageAndgender
+# from gender_prediction import emotion,ageAndgender
 names = set()
 
 
@@ -155,7 +155,7 @@ class PageThree(tk.Frame):
 
     def capimg(self):
         self.numimglabel.config(text=str("Captured Images = 0 "))
-        messagebox.showinfo("INSTRUCTIONS", "We will Capture 300 pic of your Face.")
+        messagebox.showinfo("INSTRUCTIONS", "We will Capture 999 pic of your Face.")
         x = start_capture(self.controller.active_name)
         self.controller.num_of_images = x
         self.numimglabel.config(text=str("Number of images captured = "+str(x)))
@@ -178,8 +178,10 @@ class PageFour(tk.Frame):
         label = tk.Label(self, text="Face Recognition", font='Helvetica 16 bold')
         label.grid(row=0,column=0, sticky="ew")
         button1 = tk.Button(self, text="Face Recognition", command=self.openwebcam, fg="#ffffff", bg="#263942")
-        #button2 = tk.Button(self, text="Emotion Detection", command=self.emot, fg="#ffffff", bg="#263942")
-        #button3 = tk.Button(self, text="Gender and Age Prediction", command=self.gender_age_pred, fg="#ffffff", bg="#263942")
+
+        # button2 = tk.Button(self, text="Emotion Detection", command=self.emot, fg="#ffffff", bg="#263942")
+        # button3 = tk.Button(self, text="Gender and Age Prediction", command=self.gender_age_pred, fg="#ffffff", bg="#263942")
+
         button4 = tk.Button(self, text="Go to Home Page", command=lambda: self.controller.show_frame("StartPage"), bg="#ffffff", fg="#263942")
         button1.grid(row=1,column=0, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
         #button2.grid(row=1,column=1, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
@@ -188,10 +190,12 @@ class PageFour(tk.Frame):
 
     def openwebcam(self):
         main_app(self.controller.active_name)
-    #def gender_age_pred(self):
-     #  ageAndgender()
-    #def emot(self):
-     #   emotion()
+
+    # def gender_age_pred(self):
+    #     ageAndgender()
+
+    # def emot(self):
+    #     emotion()
 
 
 
