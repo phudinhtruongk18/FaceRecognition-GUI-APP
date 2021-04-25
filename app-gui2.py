@@ -109,7 +109,6 @@ class StartPage(tk.Frame):
         global names
         if names is not None:
             print("Detecting....")
-            print(names)
             dec = detector(names)
             dec.main_app()
         else:

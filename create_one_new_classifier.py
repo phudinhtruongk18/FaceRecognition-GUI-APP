@@ -33,4 +33,4 @@ def train_one_classifer(name):
 
     print("We have already trained.")
 
-# train_one_classifer("BeNhi")
+# train_one_classifer("PhuDinh")

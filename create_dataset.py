@@ -46,4 +46,4 @@ def start_capture(name):
     print("Got enough data !")
     return numOfData
 
-# start_capture("BeNhi")
+# start_capture("PhuDinh")

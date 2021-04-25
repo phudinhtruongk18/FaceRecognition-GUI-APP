@@ -3,11 +3,14 @@ import cv2
 from PIL import Image
 import threading
 
+from UserClass import ListUserDetector
+
 
 class detector:
     def __init__(self, names):
         # List users
-        self.list_users = names
+        self.list_users = ListUserDetector(names)
+        self.list_users.xemDanhSach()
         # List recognizer
         self.recognizer = []
         # List value confidence after 1 frame
@@ -36,7 +39,7 @@ class detector:
             self.recognizer[i] = cv2.face.LBPHFaceRecognizer_create()
 
             # Read  file classifier
-            path_t = "./data/classifiers/" + self.list_users[i] + "_classifier.xml"
+            path_t = "./data/classifiers/" + self.list_users[i].name + "_classifier.xml"
             self.recognizer[i].read(path_t)
 
         # cap = cv2.VideoCapture("./data/videos/clip0.mp4")
@@ -80,9 +83,16 @@ class detector:
                     colorRectangle = (250,128,114)
                     # try to up confidence to give it more secure
                     # turn it to 40 if num of user more than 100
-                    if self.confidence[index_min][index_face] > 50:
-                        text = self.list_users[index_min]
-                        colorRectangle = (0, 255, 0)
+                    if self.confidence[index_min][index_face] > 60:
+                        self.list_users[index_min].xac_nhan_nguoi_dung()
+                        # if detect more than 10 frame then start couting to make sure
+                        if self.list_users[index_min].counter > 10:
+                            text = self.list_users[index_min].name + " " + str(self.list_users[index_min].counter) + "%"
+                            colorRectangle = (0, 255, 0)
+                            if self.list_users[index_min].counter > 30:
+                                text = self.list_users[index_min].name + " Detect complete !"
+                                colorRectangle = (255, 255, 0)
+
                     self.frame = cv2.rectangle(self.frame, (x, y), (x + w, y + h), colorRectangle, 2)
                     self.frame = cv2.putText(self.frame, text, (x, y - 4), self.font, 1, colorRectangle, 1, cv2.LINE_AA)
 
