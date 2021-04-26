@@ -66,7 +66,7 @@ class StartPage(tk.Frame):
         self.controller = controller
         # load = Image.open("homepagepic.png")
         # load = load.resize((250, 250), Image.ANTIALIAS)
-        render = PhotoImage(file='../View/homepagepic.png')
+        render = PhotoImage(file='../View/Stock/homepagepic.png')
         img = tk.Label(self, image=render)
         img.image = render
         img.grid(row=0, column=1, rowspan=4, sticky="nsew")
@@ -246,5 +246,5 @@ class PageThree(tk.Frame):
 
 
 app = MainUI()
-app.iconphoto(False, tk.PhotoImage(file='../View/icon.ico'))
+app.iconphoto(False, tk.PhotoImage(file='../View/Stock/icon.ico'))
 app.mainloop()
