@@ -3,9 +3,9 @@ import os
 
 
 def start_capture(name):
-    face_classifier = cv2.CascadeClassifier("./Model/data/haarcascade_frontalface_default.xml")
+    face_classifier = cv2.CascadeClassifier("../Model/data/haarcascade_frontalface_default.xml")
     # load
-    path = "./Model/data/users_photos/" + name
+    path = "../Model/data/users_photos/" + name
 
     try:
         os.makedirs(path)
@@ -28,7 +28,8 @@ def start_capture(name):
         ret, frame = cap.read()
         cv2.imshow("real", frame)
         if face_cropped(frame) is not None:
-            face = cv2.resize(face_cropped(frame), (200, 200))
+            # face = cv2.resize(face_cropped(frame), (200, 200))
+            face = face_cropped(frame)
             face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
             file_name_path = path+"/"+str(numOfData)+name+".jpg"
             cv2.imwrite(file_name_path, face)
@@ -48,4 +49,4 @@ def start_capture(name):
     print("Got enough data !")
     return numOfData
 
-# start_capture("PhuDinh")
+# start_capture("PhuDinh2")

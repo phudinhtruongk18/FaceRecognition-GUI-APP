@@ -8,15 +8,15 @@ from tkinter import messagebox, PhotoImage
 
 # from PIL import ImageTk, Image
 # from gender_prediction import emotion,age And gender
-names = []
 
+names = []
 
 class MainUI(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         global names
-        with open("./Model/nameslist.txt", "r") as f:
+        with open("../Model/nameslist.txt", "r") as f:
             x = f.read()
             z = x.rstrip().split(" ")
             for i in z:
@@ -54,7 +54,7 @@ class MainUI(tk.Tk):
                 if name != "None":
                     str_names = str_names + name + " "
 
-            f = open("./Model/nameslist.txt", "w")
+            f = open("../Model/nameslist.txt", "w")
             f.write(str_names)
             self.destroy()
 
@@ -66,7 +66,7 @@ class StartPage(tk.Frame):
         self.controller = controller
         # load = Image.open("homepagepic.png")
         # load = load.resize((250, 250), Image.ANTIALIAS)
-        render = PhotoImage(file='./View/homepagepic.png')
+        render = PhotoImage(file='../View/homepagepic.png')
         img = tk.Label(self, image=render)
         img.image = render
         img.grid(row=0, column=1, rowspan=4, sticky="nsew")
@@ -95,7 +95,7 @@ class StartPage(tk.Frame):
                 if i != "None":
                     str_names = str_names + i + " "
 
-            f = open("./Model/nameslist.txt", "w")
+            f = open("../Model/nameslist.txt", "w")
             f.write(str_names)
             self.controller.destroy()
 
@@ -195,7 +195,7 @@ class PageThree(tk.Frame):
         self.trainbutton.grid(row=1, column=1, ipadx=5, ipady=4, padx=10, pady=20)
 
     def capimg(self):
-        messagebox.showinfo("INSTRUCTIONS", "Wait to capture 200 pic of your Face.")
+        messagebox.showinfo("INSTRUCTIONS", "Wait to capture 300 pic of your Face.")
         x = start_capture(self.controller.active_name)
         self.controller.num_of_images = x
         self.numimglabel.config(text=str("Number of images captured = " + str(x) + ". Let retrain your dataset now!"))
@@ -246,5 +246,5 @@ class PageThree(tk.Frame):
 
 
 app = MainUI()
-app.iconphoto(False, tk.PhotoImage(file='./View/icon.ico'))
+app.iconphoto(False, tk.PhotoImage(file='../View/icon.ico'))
 app.mainloop()

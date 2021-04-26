@@ -6,7 +6,7 @@ import os, cv2
 # Method to train custom classifier to recognize face
 def train_classifer():
     # Read all the images in custom data-set
-    path = os.path.join(os.getcwd() + f"\\Model\\data\\users_photos\\")
+    path = os.path.join("..\\Model\\data\\users_photos\\")
 
     subdirectories = []
 
@@ -35,9 +35,8 @@ def train_classifer():
         # Train and save classifier
         clf = cv2.face.LBPHFaceRecognizer_create()
         clf.train(faces, ids)
-        clf.write("./Model/data/classifiers/" + sub + "_classifier.xml")
+        clf.write("../Model/data/classifiers/" + sub + "_classifier.xml")
 
     print("We have already trained.")
     # Return number users in dataset trained
     return subdirectories
-
