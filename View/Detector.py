@@ -79,6 +79,7 @@ class detector:
                     for i in range(len(self.list_users)):
                         if self.confidence[i][index_face] > max_conf:
                             max_conf = self.confidence[i][index_face]
+                            print(max_conf)
                             index_min = i
 
                     # Draw rectangles
@@ -87,7 +88,7 @@ class detector:
                     colorRectangle = (250,128,114)
                     # try to up confidence to give it more secure
                     # turn it to 40 if num of user more than 100
-                    if self.confidence[index_min][index_face] > 50:
+                    if self.confidence[index_min][index_face] > 70:
                         self.list_users[index_min].detect_user()
                         # if detect more than 10 frame then start couting to make sure
                         if self.list_users[index_min].counter > 10:
