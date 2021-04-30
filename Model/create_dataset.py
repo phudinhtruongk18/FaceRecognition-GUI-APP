@@ -49,4 +49,3 @@ def start_capture(name):
     print("Got enough data !")
     return numOfData
 
-# start_capture("KhangSenpai")

@@ -1,10 +1,16 @@
 from datetime import datetime
-
+# import cv2gpu
 import cv2
 import threading
 
 from Model.UserClass import ListUserDetector
 
+
+# modelConf = 'yolov3-tiny_obj.cfg'   #or just use yolov3.cfg
+# modelWeights = 'yolov3-tiny_obj_7000.weights' #or just use yolov3.weights
+# net = cv2.dnn.DNN_BACKEND_DEFAULT()
+# net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
+# net.setPreferableTarget(cv2.dnn.DNN_TARGET_OPENCL_FP16)
 
 class detector:
     def __init__(self, names):
@@ -34,6 +40,7 @@ class detector:
         list_users = self.list_users.detected_user_there(index_min)
         self.recognizer.pop(index_min)
         return list_users, self.recognizer
+    # still wonder is it necessary for this kind of oop
 
     def main_app(self):
         # init recognizers to detect for each users
@@ -66,7 +73,10 @@ class detector:
                 self.confidence.append([])
                 x = threading.Thread(target=self.thread_recog, args=(gray, faces, index,))
                 threads.append(x)
+                y = threading.Thread(target=self.thread_recog, args=(gray, faces, index,))
+                threads.append(y)
                 x.start()
+                y.start()
 
             # Wait to end all threads
             for index, thread in enumerate(threads):
@@ -88,7 +98,7 @@ class detector:
                     colorRectangle = (250,128,114)
                     # try to up confidence to give it more secure
                     # turn it to 40 if num of user more than 100
-                    if self.confidence[index_min][index_face] > 70:
+                    if self.confidence[index_min][index_face] > 60:
                         self.list_users[index_min].detect_user()
                         # if detect more than 10 frame then start couting to make sure
                         if self.list_users[index_min].counter > 10:
