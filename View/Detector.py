@@ -48,6 +48,7 @@ class detector:
 
     def main_app(self):
         # init recognizers to detect for each users
+
         for i in range(len(self.list_users)):
             self.recognizer.append([])
             self.recognizer[i] = cv2.face.LBPHFaceRecognizer_create()
@@ -61,7 +62,6 @@ class detector:
         # use this line of code for detect from your video
         cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         # cv2.CAP_DSHOW for releasing the handle to the webcam to stop warning when close
-
         while True:
             self.confidence = []
             ret, self.frame = cap.read()

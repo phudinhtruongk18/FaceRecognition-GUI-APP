@@ -1,3 +1,4 @@
+from View.DetectedUser import DetectedUser
 from View.Detector import detector
 from Model.train_all_classifiers import train_all_classifers
 from Model.create_one_new_classifier import train_one_classifer
@@ -70,22 +71,22 @@ class StartPage(tk.Frame):
         img = tk.Label(self, image=render)
         img.image = render
         img.grid(row=0, column=1, rowspan=4, sticky="nsew")
-        label = tk.Label(self, text="        Home Page        ", font=self.controller.title_font, fg="#263942")
+        label = tk.Label(self, text="     Face Attendance     \n    Recorder System    ", font=self.controller.title_font, fg="#263942")
         label.grid(row=0, sticky="ew")
 
         button1 = tk.Button(self, text="   Add a user  ", fg="#ffffff", bg="#263942",
                             command=lambda: self.controller.show_frame("PageOne"))
-        button2 = tk.Button(self, text="   Check a User  ", fg="#ffffff", bg="#263942",
-                            command=lambda: self.controller.show_frame("PageTwo"))
+        # button2 = tk.Button(self, text="   Check a User  ", fg="#ffffff", bg="#263942",
+        #                     command=lambda: self.controller.show_frame("PageTwo"))
         button3 = tk.Button(self, text="   Retrain dataset  ", fg="#ffffff", bg="#263942", command=self.train_data)
         button4 = tk.Button(self, text="   Recognition  ", fg="#ffffff", bg="#263942", command=self.openwebcam)
         button5 = tk.Button(self, text="    Quit    ", fg="#263942", bg="#ffffff", command=self.on_closing)
 
         button1.grid(row=1, column=0, ipady=3, ipadx=2)
-        button2.grid(row=2, column=0, ipady=3, ipadx=2)
-        button3.grid(row=3, column=0, ipady=3, ipadx=2)
-        button4.grid(row=4, column=0, ipady=3, ipadx=2)
-        button5.grid(row=5, column=0, ipady=3, ipadx=2)
+        # button2.grid(row=2, column=0, ipady=3, ipadx=2)
+        button3.grid(row=2, column=0, ipady=3, ipadx=2)
+        button4.grid(row=3, column=0, ipady=3, ipadx=2)
+        button5.grid(row=4, column=0, ipady=3, ipadx=2)
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Are you sure?"):
@@ -106,6 +107,9 @@ class StartPage(tk.Frame):
         names = self.controller.list_users
 
     def openwebcam(self):
+        # new_window = tk.Toplevel(self)
+        # detected_winddown = DetectedUser(new_window)
+        # to show dectected employee
         global names
         if names is not None:
             print("Detecting....")
@@ -190,6 +194,7 @@ class PageThree(tk.Frame):
         self.numimglabel = tk.Label(self, text="Number of images captured = 0", font='Helvetica 12 bold', fg="#263942")
         self.numimglabel.grid(row=0, column=0, columnspan=2, sticky="ew", pady=10)
         self.capturebutton = tk.Button(self, text="Capture Data Set", fg="#ffffff", bg="#263942", command=self.capimg)
+        self.backtomenu = tk.Button(self, text="Back To Menu ", fg="#ffffff", bg="#263942", command=self.showmenu)
         self.trainbutton = tk.Button(self, text="Train the model of this user", fg="#ffffff", bg="#263942", command=self.trainmodel)
         self.capturebutton.grid(row=1, column=0, ipadx=5, ipady=4, padx=10, pady=20)
         self.trainbutton.grid(row=1, column=1, ipadx=5, ipady=4, padx=10, pady=20)
@@ -199,6 +204,11 @@ class PageThree(tk.Frame):
         x = start_capture(self.controller.active_name)
         self.controller.num_of_images = x
         self.numimglabel.config(text=str("Number of images captured = " + str(x) + ". Let retrain your dataset now!"))
+        self.backtomenu.grid(row=2, column=0, ipadx=5, ipady=4, padx=10, pady=20)
+
+
+    def showmenu(self):
+        self.controller.show_frame("StartPage")
 
     def trainmodel(self):
         if self.controller.num_of_images <= 0:

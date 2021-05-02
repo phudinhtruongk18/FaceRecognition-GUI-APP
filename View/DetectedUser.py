@@ -58,8 +58,3 @@ class DetectedUser:
     def on_mouse_scroll(self, event):
         self.canvas.yview_scroll(-1 * int((event.delta / 150)), "units")
 
-master = jra.Tk()
-new_window = jra.Toplevel(master)
-detected_winddown = DetectedUser(new_window)
-master.mainloop()
-
