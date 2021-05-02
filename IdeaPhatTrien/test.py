@@ -1,60 +1,16 @@
-import numpy as np
-from timeit import default_timer as timer
-from numba import vectorize
+import cv2
 
-# This should be a substantially high value. On my test machine, this took
-# 33 seconds to run via the CPU and just over 3 seconds on the GPU.
-NUM_ELEMENTS = 100000000
+face_cascade = cv2.CascadeClassifier('../Model/data/haarcascade_frontalface_default.xml')
 
+cap = cv2.VideoCapture("../Model/data/video/BeEm.mp4")
+while True:
+    bruuh, frame = cap.read()
+    gray = cv2.cvtColor(cv2.UMat(frame), cv2.COLOR_BGR2GRAY)
+    if frame is None:
+        break
+    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    cv2.imshow("image", frame)
+    cv2.imshow("image3", gray)
+    if cv2.waitKey(20) & 0xFF == ord('q'):
+        break
 
-# This is the CPU version.
-def vector_add_cpu(a, b):
-    c = np.zeros(NUM_ELEMENTS, dtype=np.float32)
-    for i in range(NUM_ELEMENTS):
-        c[i] = a[i] + b[i]
-    return c
-
-
-# This is the GPU version. Note the @vectorize decorator. This tells
-# numba to turn this into a GPU vectorized function.
-@vectorize(["float32(float32, float32)"], target='cuda')
-def vector_add_gpu(a, b):
-    return a + b
-
-
-def main():
-    a_source = np.ones(NUM_ELEMENTS, dtype=np.float32)
-    b_source = np.ones(NUM_ELEMENTS, dtype=np.float32)
-
-    # Time the CPU function
-    start = timer()
-    vector_add_cpu(a_source, b_source)
-    vector_add_cpu_time = timer() - start
-
-    # Time the GPU function
-    start = timer()
-    vector_add_gpu(a_source, b_source)
-    vector_add_gpu_time = timer() - start
-
-    # Report times
-    print("CPU function took %f seconds." % vector_add_cpu_time)
-    print("GPU function took %f seconds." % vector_add_gpu_time)
-
-    return 0
-
-
-if __name__ == "__main__":
-    print("hh")
-    main()
-
-cdef f(double x):
-    return 2*x*x + 3*x + 1
-def trapez(double a, double b, int n):
-    cdef double h = (b-a)/n
-    cdef double sum = 0, x = a
-    cdef int i
-    for i in range(n-1):
-    x += h
-        sum += f(x)
-        sum += 0.5*(f(a) + f(b))
-    return sum*h

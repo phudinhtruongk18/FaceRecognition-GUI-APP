@@ -1,5 +1,5 @@
 from View.Detector import detector
-from Model.create_classifier import train_classifer
+from Model.train_all_classifiers import train_all_classifers
 from Model.create_one_new_classifier import train_one_classifer
 from Model.create_dataset import start_capture
 import tkinter as tk
@@ -102,7 +102,7 @@ class StartPage(tk.Frame):
     def train_data(self):
         global names
         messagebox.showinfo("INSTRUCTIONS", "Wait a few minute.... we are training!")
-        self.controller.list_users = train_classifer()
+        self.controller.list_users = train_all_classifers()
         names = self.controller.list_users
 
     def openwebcam(self):
