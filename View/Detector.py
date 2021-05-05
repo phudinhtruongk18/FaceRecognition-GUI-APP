@@ -9,8 +9,8 @@ COLOR_FACE = (250, 128, 114)
 COLOR_FACE_DETECT = (0, 255, 0)
 COLOR_FACE_COMPLETE = (255, 255, 0)
 # COLOR OF TEXT OF RECTANGLE AROUND FACE
-FIRST_CONFIDENCE = 65
-SECOND_CONFIDENCE = 57
+# FIRST_CONFIDENCE = 65
+SECOND_CONFIDENCE = 45
 # 2 POWERFUL NUM THAT DECIDE IS THAT OUR USER OR NOT
 
 
@@ -22,21 +22,18 @@ class Detector:
         # List recognizer
         self.recognizer = []
         # List value confidence after 1 frame
-        self.confidence = []
 
         self.frame = None
         self.font = cv2.FONT_HERSHEY_PLAIN
         self.face_cascade = cv2.CascadeClassifier('../Model/data/haarcascade_frontalface_default.xml')
 
-    def thread_recog(self, gray, faces, index):
-        for (x, y, w, h) in faces:
+    def thread_recog(self, gray, faces, index_perdict, array_confidence_temp):
+        for indexFace,(x, y, w, h) in enumerate(faces):
             # Recognize name of face
             roi_gray = gray[y:y + h, x:x + w]
             # diff is distance between two vectors
-            id, diff = self.recognizer[index].predict(roi_gray)
-
-            confidence = 100 - int(diff)
-            self.confidence[index].append(confidence)
+            id, diff = self.recognizer[index_perdict].predict(roi_gray)
+            array_confidence_temp[indexFace][index_perdict] = int(diff)
 
     def detected_user(self, index_min, x, y, w, h):
         text = self.list_users[index_min].name + " Detect complete !"
@@ -91,7 +88,6 @@ class Detector:
         cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         while True:
             # list that have confidence of all user
-            self.confidence = []
             # READ FRAME
             ret, self.frame = cap.read()
 
@@ -107,11 +103,11 @@ class Detector:
 
             # Create threads to recognize
             # One thread run one recognizer to detect faces then predict with it's user
+            array_confidence = np.empty((len(faces),len(self.list_users)),dtype=np.int16)
 
             threads = list()
             for index in range(len(self.list_users)):
-                self.confidence.append([])
-                x = threading.Thread(target=self.thread_recog, args=(gray, faces, index,))
+                x = threading.Thread(target=self.thread_recog, args=(gray, faces, index,array_confidence))
                 threads.append(x)
                 x.start()
 
@@ -122,13 +118,8 @@ class Detector:
             # If found face then do
             if len(faces) > 0:
                 for index_face, (x, y, w, h) in enumerate(faces):
-                    max_conf = self.confidence[0][index_face]
-                    index_min = 0
-                    for i in range(len(self.list_users)):
-                        if self.confidence[i][index_face] > max_conf:
-                            max_conf = self.confidence[i][index_face]
-                            print(max_conf)
-                            index_min = i
+                    max_conf = array_confidence[index_face].min()
+                    index_min = array_confidence[index_face].argmin()
 
                     # Draw rectangles
                     # Draw the best match names
@@ -136,7 +127,8 @@ class Detector:
                     colorRectangle = COLOR_FACE
                     # -> upper confidence to maximum but still got the user name
                     # turn it between 40 and 90 based on situation
-                    if self.confidence[index_min][index_face] > SECOND_CONFIDENCE:
+                    print(max_conf)
+                    if max_conf < SECOND_CONFIDENCE:
                         self.list_users[index_min].detect_user()
                         # if detect more than 10 point then begin to show
                         if self.list_users[index_min].counter > 10:
