@@ -4,13 +4,14 @@ from Model.train_all_classifiers import train_all_classifers
 from Model.create_one_new_classifier import train_one_classifer
 from Model.create_dataset import start_capture
 import tkinter as tk
-from tkinter import font as tkfont
+from tkinter import font as tkfont, ttk
 from tkinter import messagebox, PhotoImage
 
 # from PIL import ImageTk, Image
 # from gender_prediction import emotion,age And gender
 
 names = []
+
 
 class MainUI(tk.Tk):
 
@@ -25,7 +26,7 @@ class MainUI(tk.Tk):
         self.title_font = tkfont.Font(family='Helvetica', size=16, weight="bold")
         self.title("Face Recognizer")
         self.resizable(False, False)
-        self.geometry("500x350")
+        self.geometry("510x350")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.active_name = None
 
@@ -71,6 +72,8 @@ class StartPage(tk.Frame):
         img = tk.Label(self, image=render)
         img.image = render
         img.grid(row=0, column=1, rowspan=4, sticky="nsew")
+        self.progress_bar = ttk.Progressbar(self, orient=tk.HORIZONTAL, length=100, mode="determinate")
+        self.progress_bar.grid(row=4, column=1, sticky="nsew")
         label = tk.Label(self, text="     Face Attendance     \n    Recorder System    ", font=self.controller.title_font, fg="#263942")
         label.grid(row=0, sticky="ew")
 
@@ -107,14 +110,15 @@ class StartPage(tk.Frame):
         names = self.controller.list_users
 
     def openwebcam(self):
-        # new_window = tk.Toplevel(self)
-        # detected_winddown = DetectedUser(new_window)
-        # to show dectected employee
         global names
         if names is not None:
             print("Detecting....")
-            dec = Detector(names)
-            dec.main_app()
+            dec = Detector(names,self.progress_bar)
+            dec.start()
+            # to show dectected employee
+            new_window = tk.Toplevel(self)
+            detected_winddown = DetectedUser(new_window)
+
         else:
             messagebox.showinfo("INSTRUCTIONS", "List users is empty. Let add someone first!")
 

@@ -1,6 +1,6 @@
 from datetime import datetime
 import cv2
-import threading
+from threading import Thread
 import numpy as np
 
 from Model.UserClass import ListUserDetector
@@ -9,14 +9,19 @@ COLOR_FACE = (250, 128, 114)
 COLOR_FACE_DETECT = (0, 255, 0)
 COLOR_FACE_COMPLETE = (255, 255, 0)
 # COLOR OF TEXT OF RECTANGLE AROUND FACE
-# FIRST_CONFIDENCE = 65
-SECOND_CONFIDENCE = 45
+# FIRST_DIFF = 30
+SECOND_DIFF = 40
+
+
 # 2 POWERFUL NUM THAT DECIDE IS THAT OUR USER OR NOT
 
 
-class Detector:
-    def __init__(self, names):
+class Detector(Thread):
+    def __init__(self, names,progress_bar):
         # List users
+        super().__init__()
+        self.progress = 1
+        self.progress_bar = progress_bar
         self.list_users = ListUserDetector(names)
         self.list_users.show_list_users()
         # List recognizer
@@ -27,8 +32,11 @@ class Detector:
         self.font = cv2.FONT_HERSHEY_PLAIN
         self.face_cascade = cv2.CascadeClassifier('../Model/data/haarcascade_frontalface_default.xml')
 
+    def run(self):
+        self.main_app()
+
     def thread_recog(self, gray, faces, index_perdict, array_confidence_temp):
-        for indexFace,(x, y, w, h) in enumerate(faces):
+        for indexFace, (x, y, w, h) in enumerate(faces):
             # Recognize name of face
             roi_gray = gray[y:y + h, x:x + w]
             # diff is distance between two vectors
@@ -54,7 +62,7 @@ class Detector:
         for index_to_read in list_index:
             path_t = "../Model/data/classifiers/" + self.list_users[index_to_read].name + "_classifier.xml"
             self.recognizer[index_to_read].read(path_t)
-            print("Load ", index_to_read + 1, "on", self.list_users.__len__())
+            self.progress_bar['value'] += (self.progress+1)/len(self.list_users) * 100
 
     def read_necessary_classifiers(self):
         # Create this list to Multithreading
@@ -70,7 +78,7 @@ class Detector:
         list1, list2, list3, list4, list5, list6, list7, list8 = np.array_split(list_index_user, 8)
         read_threads = list()
         for list_temp in [list1, list2, list3, list4, list5, list6, list7, list8]:
-            temp_reading_thread = threading.Thread(target=self.read_single_classifier, args=(list_temp,))
+            temp_reading_thread = Thread(target=self.read_single_classifier, args=(list_temp,))
             read_threads.append(temp_reading_thread)
             temp_reading_thread.start()
 
@@ -103,11 +111,11 @@ class Detector:
 
             # Create threads to recognize
             # One thread run one recognizer to detect faces then predict with it's user
-            array_confidence = np.empty((len(faces),len(self.list_users)),dtype=np.int16)
+            array_confidence = np.full((len(faces), len(self.list_users)), 100, dtype=np.int16)
 
             threads = list()
             for index in range(len(self.list_users)):
-                x = threading.Thread(target=self.thread_recog, args=(gray, faces, index,array_confidence))
+                x = Thread(target=self.thread_recog, args=(gray, faces, index, array_confidence))
                 threads.append(x)
                 x.start()
 
@@ -118,7 +126,7 @@ class Detector:
             # If found face then do
             if len(faces) > 0:
                 for index_face, (x, y, w, h) in enumerate(faces):
-                    max_conf = array_confidence[index_face].min()
+                    min_diff = array_confidence[index_face].min()
                     index_min = array_confidence[index_face].argmin()
 
                     # Draw rectangles
@@ -127,8 +135,8 @@ class Detector:
                     colorRectangle = COLOR_FACE
                     # -> upper confidence to maximum but still got the user name
                     # turn it between 40 and 90 based on situation
-                    print(max_conf)
-                    if max_conf < SECOND_CONFIDENCE:
+                    print(min_diff)
+                    if min_diff < SECOND_DIFF:
                         self.list_users[index_min].detect_user()
                         # if detect more than 10 point then begin to show
                         if self.list_users[index_min].counter > 10:
@@ -141,6 +149,7 @@ class Detector:
                     self.frame = cv2.putText(self.frame, text, (x, y - 4), self.font, 1, colorRectangle, 1, cv2.LINE_AA)
 
             cv2.imshow("image", self.frame)
+            print(array_confidence)
             # show the result
             if cv2.waitKey(20) & 0xFF == ord('q'):
                 break
