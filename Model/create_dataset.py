@@ -29,8 +29,8 @@ def start_capture(name):
         cv2.imshow("real", frame)
         if face_cropped(frame) is not None:
             # resize if you want to use another camera (reduce the size of data)
-            # face = cv2.resize(face_cropped(frame), (200, 200))
-            face = face_cropped(frame)
+            face = cv2.resize(face_cropped(frame), (200, 200))
+            # face = face_cropped(frame)
             face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
             file_name_path = path+"/"+str(numOfData)+name+".jpg"
             cv2.imwrite(file_name_path, face)

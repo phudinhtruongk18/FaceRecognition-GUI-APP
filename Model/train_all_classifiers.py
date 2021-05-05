@@ -23,7 +23,7 @@ def train_all_classifers():
             pictures = files2
         for pic in pictures:
             imgpath = os.path.join(path, sub, pic)
-            img = Image.open(imgpath).convert('L')
+            img = Image.open(imgpath)
             imageNp = np.array(img, 'uint8')
 
             id = int(pic.split(sub)[0])

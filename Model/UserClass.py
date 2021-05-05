@@ -8,9 +8,6 @@ class ListUserDetector(list):
         for tempUser in self:
             print(tempUser.name)
 
-    # def detected_user_there(self,index):
-    #     self.pop(index)
-    #     return self
 
 class UserDetector:
     def __init__(self, name):
@@ -18,4 +15,4 @@ class UserDetector:
         self.name = name
 
     def detect_user(self):
-        self.counter += 10
+        self.counter += 8

@@ -1,5 +1,5 @@
 from View.DetectedUser import DetectedUser
-from View.Detector import detector
+from View.Detector import Detector
 from Model.train_all_classifiers import train_all_classifers
 from Model.create_one_new_classifier import train_one_classifer
 from Model.create_dataset import start_capture
@@ -113,7 +113,7 @@ class StartPage(tk.Frame):
         global names
         if names is not None:
             print("Detecting....")
-            dec = detector(names)
+            dec = Detector(names)
             dec.main_app()
         else:
             messagebox.showinfo("INSTRUCTIONS", "List users is empty. Let add someone first!")
