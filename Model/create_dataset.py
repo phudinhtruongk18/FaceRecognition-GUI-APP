@@ -28,6 +28,7 @@ def start_capture(name):
         ret, frame = cap.read()
         cv2.imshow("real", frame)
         if face_cropped(frame) is not None:
+            # resize if you want to use another camera (reduce the size of data)
             # face = cv2.resize(face_cropped(frame), (200, 200))
             face = face_cropped(frame)
             face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
@@ -38,8 +39,8 @@ def start_capture(name):
 
             cv2.imshow("Cropped_Face", face)
         else:
-            print("hi")
-            # cv2.putText(frame, str("emty"), (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 2)
+            print("No Face Can Be Found")
+            # cv2.putText(frame, str("empty"), (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 2)
         key = cv2.waitKey(1) & 0xFF
         if key == ord("q") or key == 27 or numOfData > 300:
             break

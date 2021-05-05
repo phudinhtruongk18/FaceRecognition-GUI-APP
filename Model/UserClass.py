@@ -18,4 +18,4 @@ class UserDetector:
         self.name = name
 
     def detect_user(self):
-        self.counter += 3
+        self.counter += 10
