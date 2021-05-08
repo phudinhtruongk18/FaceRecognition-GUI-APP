@@ -1,4 +1,4 @@
-import Controller.Program as ProgramUI
+import Controller.UIProgram as ProgramUI
 import tkinter as tk
 
 if __name__ == '__main__':

@@ -17,11 +17,11 @@ SECOND_DIFF = 40
 
 
 class Detector(Thread):
-    def __init__(self, names,progress_bar):
+    def __init__(self, names, controller):
         # List users
         super().__init__()
         self.progress = 1
-        self.progress_bar = progress_bar
+        self.controller = controller
         self.list_users = ListUserDetector(names)
         self.list_users.show_list_users()
         # List recognizer
@@ -62,7 +62,7 @@ class Detector(Thread):
         for index_to_read in list_index:
             path_t = "Model/data/classifiers/" + self.list_users[index_to_read].name + "_classifier.xml"
             self.recognizer[index_to_read].read(path_t)
-            self.progress_bar['value'] += (self.progress+1)/len(self.list_users) * 100
+            self.controller.progress_bar['value'] += (self.progress+1)/len(self.list_users) * 100
 
     def read_necessary_classifiers(self):
         # Create this list to Multithreading
@@ -89,10 +89,13 @@ class Detector(Thread):
 
     def main_app(self):
         self.read_necessary_classifiers()
+        # to show dectected employee
+        self.controller.open_dectect_UI()
+
         # use this line of code for detect from video
-        cap = cv2.VideoCapture("Model/data/video/BeEm.mp4")
+        # cap = cv2.VideoCapture("Model/data/video/dilam.mp4")
         # cv2.CAP_DSHOW for releasing the handle to the webcam to stop warning when close
-        # cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         while True:
             # list that have confidence of all user
             # READ FRAME

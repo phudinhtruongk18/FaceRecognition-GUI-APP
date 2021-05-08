@@ -43,18 +43,21 @@ lmain.grid()
 cap = cv2.VideoCapture(0)
 
 # function for video streaming
-def video_stream():
-    _, frame = cap.read()
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray, (3, 5), 0)
-    retval, thresh = cv2.threshold(blur, 38, 300, cv2.THRESH_BINARY)
+# def video_stream():
+#     _, frame = cap.read()
+#     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+#     blur = cv2.GaussianBlur(gray, (3, 5), 0)
+#     retval, thresh = cv2.threshold(blur, 38, 300, cv2.THRESH_BINARY)
+#
+#     cv2image = cv2.cvtColor(thresh, cv2.COLOR_BGR2RGBA)
+#     img = Image.fromarray(cv2image)
+#     imgtk = ImageTk.PhotoImage(image=img)
+#     lmain.imgtk = imgtk
+#     lmain.configure(image=imgtk)
+#     lmain.after(1, video_stream)
+#
+# video_stream()
+# root.mainloop()
 
-    cv2image = cv2.cvtColor(thresh, cv2.COLOR_BGR2RGBA)
-    img = Image.fromarray(cv2image)
-    imgtk = ImageTk.PhotoImage(image=img)
-    lmain.imgtk = imgtk
-    lmain.configure(image=imgtk)
-    lmain.after(1, video_stream)
+#!/usr/bin/env python
 
-video_stream()
-root.mainloop()
