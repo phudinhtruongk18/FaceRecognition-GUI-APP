@@ -1,34 +1,20 @@
-import os
-import textwrap
 from tkinter import ttk
 import tkinter as jra
 from PIL import ImageTk, Image
-
-# from SanPham import SanPham
-
-# linkThuMuc = os.path.abspath(os.getcwd())
 
 
 class DetectedUser:
     def __init__(self, master_temp):
         self.master = master_temp
         self.master.title("Detected User")
-        # master.iconbitmap("logo.ico")
-        w = 980  # width for the Tk root
-        h = 550  # height for the Tk root
-        ws = master_temp.winfo_screenwidth()  # width of the screen
-        hs = master_temp.winfo_screenheight()  # height of the screen
-        x = ws/2 - w/2 + 20
-        y = (hs / 2) + 20
-        self.master.geometry('%dx%d+%d+%d' % (w, h, x, y))
-        # pad = 3
-        # self.master.geometry("{0}x{1}+0+0".format(
-        #     self.master.winfo_screenwidth() - pad, self.master.winfo_screenheight() - pad))
-        self.ROOT_FRAME = jra.Frame(self.master, bg="pink", height=600)
+        w = 1920
+        hCanvas = 1080
+        self.master.geometry("{0}x{1}+0+0".format(w,hCanvas))
+        self.ROOT_FRAME = jra.Frame(self.master, bg="pink", height=hCanvas)
         self.ROOT_FRAME.grid(row=0, column=0, sticky="nswe")
         self.right_frame = jra.Frame(self.ROOT_FRAME)
         self.right_frame.grid(row=0, column=1)
-        self.camera_real_time = jra.Canvas(self.right_frame)
+        self.camera_real_time = jra.Canvas(self.right_frame, width=w/3)
         self.camera_real_time.pack()
         self.time_left = jra.Label(self.right_frame,text="time left")
         self.time_left.pack()
@@ -43,7 +29,7 @@ class DetectedUser:
 
         self.left_frame = jra.Frame(self.ROOT_FRAME)
         self.left_frame.grid(row=0, column=2)
-        self.canvas = jra.Canvas(self.left_frame, width=w * 2/3, height=h)
+        self.canvas = jra.Canvas(self.left_frame, width=w * 2/3, height=hCanvas)
         # self.canvas = jra.Canvas(self.left_frame)
         self.canvas.pack(side=jra.LEFT, fill=jra.BOTH, expand=1)
         self.scrool_bar = ttk.Scrollbar(self.left_frame, orient=jra.VERTICAL, command=self.canvas.yview)
@@ -76,6 +62,10 @@ class DetectedUser:
         self.master.withdraw()
 
     def show(self):
+        # self.master.attributes('-fullscreen', True)
+        # w = self.master.winfo_screenwidth() - 3  # width of the screen
+        # h = self.master.winfo_screenheight() - 60  # height of the screen
+        # hCanvas = h - 10
         self.master.deiconify()
 
     def on_configure(self, event=None):
@@ -84,12 +74,23 @@ class DetectedUser:
     def on_mouse_scroll(self, event):
         self.canvas.yview_scroll(-1 * int((event.delta / 150)), "units")
 
+    def get_right_size(self,wi,he):
+        ratio = wi / he
+        if ratio > 0:
+            he,wi = 300,300*ratio
+        else:
+            wi,he = 300,300*ratio
+        return int(wi),int(he)
+
     def add_detected_user(self,user_id):
+
         link_user = "View/Detected/"+user_id+".jpg"
-        img = ImageTk.PhotoImage(Image.open(link_user).resize((46 * 8, 60 * 8), Image.ANTIALIAS))
+        user_pic = Image.open(link_user)
+        # get right size of user picture and resize to make it look good
+        img = ImageTk.PhotoImage(user_pic.resize(self.get_right_size(user_pic.width, user_pic.height), Image.ANTIALIAS))
         self.list_images.append(img)
         index = self.list_images.__len__() - 1
-        button = jra.Button(self.secondFrame, image=self.list_images[index])
+        button = jra.Button(self.secondFrame, image=self.list_images[index], width=300, height=300)
         self.list_buttons.append(button)
         if self.column == 5:
             self.column = 0

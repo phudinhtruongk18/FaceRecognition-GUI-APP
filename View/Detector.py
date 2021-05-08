@@ -5,15 +5,14 @@ import numpy as np
 
 from Model.UserClass import ListUserDetector
 
+# COLOR OF TEXT OF RECTANGLE AROUND FACE
 COLOR_FACE = (250, 128, 114)
 COLOR_FACE_DETECT = (0, 255, 0)
 COLOR_FACE_COMPLETE = (255, 255, 0)
-# COLOR OF TEXT OF RECTANGLE AROUND FACE
-# FIRST_DIFF = 30
-SECOND_DIFF = 40
-
 
 # 2 POWERFUL NUM THAT DECIDE IS THAT OUR USER OR NOT
+# FIRST_DIFF = 30
+SECOND_DIFF = 47
 
 
 class Detector(Thread):
@@ -96,9 +95,9 @@ class Detector(Thread):
         self.menu_UI.open_dectect_UI()
 
         # use this line of code for detect from video
-        cap = cv2.VideoCapture("Model/data/video/dilam.mp4")
+        # cap = cv2.VideoCapture("Model/data/video/dilam.mp4")
         # cv2.CAP_DSHOW for releasing the handle to the webcam to stop warning when close
-        # cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         while True:
             # list that have confidence of all user
             # READ FRAME
