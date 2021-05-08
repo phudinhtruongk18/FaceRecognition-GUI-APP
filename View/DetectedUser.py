@@ -40,7 +40,7 @@ class DetectedUser:
         self.list_images = []
 
         for temp in range(120):
-            link_temp = "../View/Stock/user-circle.png"
+            link_temp = "View/Stock/user-circle.png"
             img = ImageTk.PhotoImage(Image.open(link_temp).resize((46 * 4, 60 * 4), Image.ANTIALIAS))
             self.list_images.append(img)
         self.row = 0

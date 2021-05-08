@@ -30,7 +30,7 @@ class Detector(Thread):
 
         self.frame = None
         self.font = cv2.FONT_HERSHEY_PLAIN
-        self.face_cascade = cv2.CascadeClassifier('../Model/data/haarcascade_frontalface_default.xml')
+        self.face_cascade = cv2.CascadeClassifier('Model/data/haarcascade_frontalface_default.xml')
 
     def run(self):
         self.main_app()
@@ -52,7 +52,7 @@ class Detector(Thread):
         self.frame = cv2.putText(self.frame, text, (x, y - 4), self.font, 1, COLOR_FACE_COMPLETE, 1,
                                  cv2.LINE_AA)
         # get name of customer and write on the frame
-        cv2.imwrite("../View/Detected/" + self.list_users[index_min].name + ".jpg", self.frame)
+        cv2.imwrite("View/Detected/" + self.list_users[index_min].name + ".jpg", self.frame)
         # save that frame to show later
         self.list_users.pop(index_min)
         self.recognizer.pop(index_min)
@@ -60,7 +60,7 @@ class Detector(Thread):
 
     def read_single_classifier(self, list_index):
         for index_to_read in list_index:
-            path_t = "../Model/data/classifiers/" + self.list_users[index_to_read].name + "_classifier.xml"
+            path_t = "Model/data/classifiers/" + self.list_users[index_to_read].name + "_classifier.xml"
             self.recognizer[index_to_read].read(path_t)
             self.progress_bar['value'] += (self.progress+1)/len(self.list_users) * 100
 
@@ -89,11 +89,10 @@ class Detector(Thread):
 
     def main_app(self):
         self.read_necessary_classifiers()
-
         # use this line of code for detect from video
-        # cap = cv2.VideoCapture("../Model/data/video/BeEm.mp4")
+        cap = cv2.VideoCapture("Model/data/video/BeEm.mp4")
         # cv2.CAP_DSHOW for releasing the handle to the webcam to stop warning when close
-        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        # cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         while True:
             # list that have confidence of all user
             # READ FRAME

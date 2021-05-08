@@ -3,9 +3,9 @@ import os
 
 
 def start_capture_from_video(name):
-    face_classifier = cv2.CascadeClassifier("../Model/data/haarcascade_frontalface_default.xml")
+    face_classifier = cv2.CascadeClassifier("Model/data/haarcascade_frontalface_default.xml")
     # load
-    path = "../Model/data/users_photos/" + name
+    path = "Model/data/users_photos/" + name
 
     try:
         os.makedirs(path)
@@ -21,7 +21,7 @@ def start_capture_from_video(name):
             cropped_face = img[y:y + h, x:x + w]
             return cropped_face
 
-    cap = cv2.VideoCapture("../Model/data/video/Buttercup.mov")
+    cap = cv2.VideoCapture("Model/data/video/Buttercup.mov")
     numOfData = 0
 
     while True:

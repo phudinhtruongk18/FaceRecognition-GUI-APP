@@ -3,9 +3,9 @@ import os
 
 
 def start_capture(name):
-    face_classifier = cv2.CascadeClassifier("../Model/data/haarcascade_frontalface_default.xml")
+    face_classifier = cv2.CascadeClassifier("Model/data/haarcascade_frontalface_default.xml")
     # load
-    path = "../Model/data/users_photos/" + name
+    path = "Model/data/users_photos/" + name
 
     try:
         os.makedirs(path)
