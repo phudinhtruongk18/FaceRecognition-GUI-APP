@@ -39,23 +39,40 @@ class DetectedUser:
         self.list_buttons = []
         self.list_images = []
 
-        for temp in range(120):
-            link_temp = "View/Stock/user-circle.png"
-            img = ImageTk.PhotoImage(Image.open(link_temp).resize((46 * 4, 60 * 4), Image.ANTIALIAS))
-            self.list_images.append(img)
+        # for temp in range(120):
+        #     link_temp = "View/Stock/user-circle.png"
+        #     img = ImageTk.PhotoImage(Image.open(link_temp).resize((46 * 4, 60 * 4), Image.ANTIALIAS))
+        #     self.list_images.append(img)
         self.row = 0
         self.column = 0
-        for temp in range(120):
-            button = jra.Button(self.secondFrame, text=temp, image=self.list_images[temp])
-            # button.configure(command=lambda btn=button: self.OnClick(btn))
-            if self.column == 10:
-                self.column = 0
-                self.row += 1
-            self.column += 1
-            self.list_buttons.append(button)
-            button.grid(row=self.row, column=self.column)
+        # for temp in range(120):
+        #     button = jra.Button(self.secondFrame, text=temp, image=self.list_images[temp])
+        #     # button.configure(command=lambda btn=button: self.OnClick(btn))
+        #     if self.column == 10:
+        #         self.column = 0
+        #         self.row += 1
+        #     self.column += 1
+        #     self.list_buttons.append(button)
+        #     button.grid(row=self.row, column=self.column)
         self.scrool_bar.pack(side=jra.RIGHT, fill=jra.Y)
+        self.master.withdraw()
+
+    def show(self):
+        self.master.deiconify()
 
     def on_mouse_scroll(self, event):
         self.canvas.yview_scroll(-1 * int((event.delta / 150)), "units")
 
+    def add_detected_user(self,user_id):
+        link_user = "View/Detected/"+user_id+".jpg"
+        img = ImageTk.PhotoImage(Image.open(link_user).resize((46 * 4, 60 * 4), Image.ANTIALIAS))
+        self.list_images.append(img)
+        index = self.list_images.__len__() - 1
+        button = jra.Button(self.secondFrame, image=self.list_images[index])
+        self.list_buttons.append(button)
+        if self.column == 10:
+            self.column = 0
+            self.row += 1
+        self.column += 1
+        self.list_buttons.append(button)
+        button.grid(row=self.row, column=self.column)

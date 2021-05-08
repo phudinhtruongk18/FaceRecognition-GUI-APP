@@ -17,11 +17,11 @@ SECOND_DIFF = 40
 
 
 class Detector(Thread):
-    def __init__(self, names, controller):
+    def __init__(self, names, menu_UI):
         # List users
         super().__init__()
         self.progress = 1
-        self.controller = controller
+        self.menu_UI = menu_UI
         self.list_users = ListUserDetector(names)
         self.list_users.show_list_users()
         # List recognizer
@@ -44,15 +44,18 @@ class Detector(Thread):
             array_confidence_temp[indexFace][index_perdict] = int(diff)
 
     def detected_user(self, index_min, x, y, w, h):
-        text = self.list_users[index_min].name + " Detect complete !"
+        user_id = self.list_users[index_min].name
         self.frame = cv2.rectangle(self.frame, (x, y), (x + w, y + h), COLOR_FACE_COMPLETE, 2)
         self.frame = cv2.putText(self.frame, str(datetime.now().time()), (x, y - 20), self.font, 1, COLOR_FACE_COMPLETE,
                                  1,
                                  cv2.LINE_AA)
-        self.frame = cv2.putText(self.frame, text, (x, y - 4), self.font, 1, COLOR_FACE_COMPLETE, 1,
+        self.frame = cv2.putText(self.frame, user_id + " Detect complete !", (x, y - 4), self.font, 1, COLOR_FACE_COMPLETE, 1,
                                  cv2.LINE_AA)
         # get name of customer and write on the frame
-        cv2.imwrite("View/Detected/" + self.list_users[index_min].name + ".jpg", self.frame)
+        cv2.imwrite("View/Detected/" + user_id + ".jpg", self.frame)
+        # add a new UI button right here
+        self.menu_UI.add_detected_user(user_id)
+
         # save that frame to show later
         self.list_users.pop(index_min)
         self.recognizer.pop(index_min)
@@ -62,7 +65,7 @@ class Detector(Thread):
         for index_to_read in list_index:
             path_t = "Model/data/classifiers/" + self.list_users[index_to_read].name + "_classifier.xml"
             self.recognizer[index_to_read].read(path_t)
-            self.controller.progress_bar['value'] += (self.progress+1)/len(self.list_users) * 100
+            self.menu_UI.progress_bar['value'] += (self.progress + 1) / len(self.list_users) * 100
 
     def read_necessary_classifiers(self):
         # Create this list to Multithreading
@@ -90,12 +93,12 @@ class Detector(Thread):
     def main_app(self):
         self.read_necessary_classifiers()
         # to show dectected employee
-        self.controller.open_dectect_UI()
+        self.menu_UI.open_dectect_UI()
 
         # use this line of code for detect from video
-        # cap = cv2.VideoCapture("Model/data/video/dilam.mp4")
+        cap = cv2.VideoCapture("Model/data/video/dilam.mp4")
         # cv2.CAP_DSHOW for releasing the handle to the webcam to stop warning when close
-        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        # cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         while True:
             # list that have confidence of all user
             # READ FRAME

@@ -67,6 +67,8 @@ class StartPage(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        new_window = tk.Toplevel(self)
+        self.DetectedWindow = DetectedUser(new_window)
         self.controller = controller
         # load = Image.open("homepagepic.png")
         # load = load.resize((250, 250), Image.ANTIALIAS)
@@ -122,8 +124,11 @@ class StartPage(tk.Frame):
 
     def open_dectect_UI(self):
         self.progress_bar.grid_forget()
-        new_window = tk.Toplevel(self)
-        detected_winddown = DetectedUser(new_window)
+        self.controller.withdraw()
+        self.DetectedWindow.show()
+
+    def add_detected_user(self,user_id):
+        self.DetectedWindow.add_detected_user(user_id)
 
 
 class PageOne(tk.Frame):
