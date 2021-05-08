@@ -11,8 +11,8 @@ COLOR_FACE_DETECT = (0, 255, 0)
 COLOR_FACE_COMPLETE = (255, 255, 0)
 
 # 2 POWERFUL NUM THAT DECIDE IS THAT OUR USER OR NOT
-# FIRST_DIFF = 30
-SECOND_DIFF = 47
+FIRST_DIFF = 30
+SECOND_DIFF = 45
 
 
 class Detector(Thread):
@@ -93,12 +93,12 @@ class Detector(Thread):
         self.read_necessary_classifiers()
         # to show dectected employee
         self.menu_UI.open_dectect_UI()
-
         # use this line of code for detect from video
-        # cap = cv2.VideoCapture("Model/data/video/dilam.mp4")
+        # cap = cv2.VideoCapture("Model/data/video/demo1.mp4")
         # cv2.CAP_DSHOW for releasing the handle to the webcam to stop warning when close
         cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         while True:
+
             # list that have confidence of all user
             # READ FRAME
             ret, self.frame = cap.read()
@@ -108,8 +108,6 @@ class Detector(Thread):
 
             if self.frame is None:
                 break
-            cv2.imshow("image", self.frame)
-
             gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
             faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
 
@@ -140,8 +138,15 @@ class Detector(Thread):
                     # -> upper confidence to maximum but still got the user name
                     # turn it between 40 and 90 based on situation
                     print(min_diff)
+                    # if this user pass this SECOND_DIFF so plus this user some point
                     if min_diff < SECOND_DIFF:
                         self.list_users[index_min].detect_user()
+                        # if pass FIRST_DIFF so we can surely know this is the user we want to Attendance
+                        # so give this user more and more point to make process faster
+
+                        # if min_diff < FIRST_DIFF:
+                        #     self.list_users[index_min].detect_user()
+                        #     self.list_users[index_min].detect_user()
                         # if detect more than 10 point then begin to show
                         if self.list_users[index_min].counter > 10:
                             text = self.list_users[index_min].name + " " + str(self.list_users[index_min].counter) + "%"
@@ -152,7 +157,10 @@ class Detector(Thread):
                     self.frame = cv2.rectangle(self.frame, (x, y), (x + w, y + h), colorRectangle, 2)
                     self.frame = cv2.putText(self.frame, text, (x, y - 4), self.font, 1, colorRectangle, 1, cv2.LINE_AA)
 
-            cv2.imshow("image", self.frame)
+            # cv2.imshow("image", self.frame)
+            imageRGB = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
+            self.menu_UI.update_frame(imageRGB)
+
             print(array_confidence)
             # show the result
             if cv2.waitKey(20) & 0xFF == ord('q'):

@@ -130,6 +130,9 @@ class StartPage(tk.Frame):
     def add_detected_user(self,user_id):
         self.DetectedWindow.add_detected_user(user_id)
 
+    def update_frame(self,frame):
+        self.DetectedWindow.update_image(frame)
+
 
 class PageOne(tk.Frame):
     def __init__(self, parent, controller):
