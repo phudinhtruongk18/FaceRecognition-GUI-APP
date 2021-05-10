@@ -49,9 +49,11 @@ class DetectedUser:
         self.scrool_bar.pack(side=jra.RIGHT, fill=jra.Y)
         self.master.withdraw()
 
+
     def update_image(self,frame):
         # Get the latest frame and convert image format
         # self.image = frame
+        print(frame)
         self.image = frame
         self.image = Image.fromarray(self.image)  # to PIL format
         self.image = ImageTk.PhotoImage(self.image)  # to ImageTk format
