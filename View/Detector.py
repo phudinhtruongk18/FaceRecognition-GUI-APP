@@ -36,11 +36,22 @@ class Detector(Thread):
         self.main_app()
 
     def thread_recog(self, index_perdict, numpy_confidence_temp):
-        # # Recognize id of sface
+        # compute the distance between the two histograms
         for indexFace, gray_face in enumerate(self.gray_face_list):
-            # diff is distance between two vectors
+            # so if the  The algorithm should also return the calculated distance,
+            #   which can be used as a ‘confidence’ measurement.
+            # Note: don’t be fooled about the ‘confidence’ name, as lower confidences are better because
+            #   it means the distance between the two histograms is closer.
+            # We can then use a threshold and the ‘confidence’ to automatically estimate if the algorithm has correctly
+            #   recognized the image. We can assume that the algorithm has successfully recognized if the confidence
+            #   is lower than the threshold defined.
+            # We can assume that the algorithm has successfully recognized
+            #   if the diff is lower than the threshold defined.
+            # read detail here -> https://towardsdatascience.com/face-recognition-how-lbph-works-90ec258c3d6b
             id, diff = self.recognizer[index_perdict].predict(gray_face)
+            # diff is distance distance between the two histograms (original is confidence)
             numpy_confidence_temp[indexFace][index_perdict] = int(diff)
+            # use numpy to pack our value where index is the same with self.list user
 
     def detected_user(self, index_min, x, y, w, h):
         user_id = self.list_users[index_min].name
@@ -149,8 +160,8 @@ class Detector(Thread):
                     # Draw the best match names
                     text = "Unknown"
                     colorRectangle = COLOR_FACE
-                    # -> upper confidence to maximum but still got the user name
-                    # turn it between 40 and 90 based on situation
+                    # -> upper confidence to minimum but still got the user name
+                    # turn it between 10 and 45 based on situation
                     print(min_diff)
                     # if this user pass this SECOND_DIFF so plus this user some point
                     if min_diff < SECOND_DIFF:
@@ -171,16 +182,14 @@ class Detector(Thread):
                     self.frame = cv2.rectangle(self.frame, (x, y), (x + w, y + h), colorRectangle, 2)
                     self.frame = cv2.putText(self.frame, text, (x, y - 4), self.font, 1, colorRectangle, 1, cv2.LINE_AA)
 
-            # cv2.imshow("image", self.frame)
-            # self.menu_UI.update_frame(self.frame)
-
+            # change BGR2RGB because cv2 numpy format is different from tk
             imageRGB = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
             self.menu_UI.update_frame(imageRGB)
 
             print(np_confidence)
             # show the result
-            if cv2.waitKey(20) & 0xFF == ord('q'):
-                break
+            # if cv2.waitKey(20) & 0xFF == ord('q'):
+            #     break
             # stop the program if press q
 
         cap.release()

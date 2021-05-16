@@ -26,6 +26,7 @@ def train_one_classifer(name):
 
     ids = np.array(ids)
 
+
     # Train and save classifier
     clf = cv2.face.LBPHFaceRecognizer_create()
     clf.train(faces, ids)
@@ -34,3 +35,15 @@ def train_one_classifer(name):
     print("We have already trained.")
 
 # train_one_classifer("PhuDinh2")
+'''
+from https://towardsdatascience.com/face-recognition-how-lbph-works-90ec258c3d6b
+Radius: the radius is used to build the circular local binary pattern and represents the radius around the central pixel. It is usually set to 1.
+Neighbors: the number of sample points to build the circular local binary pattern. Keep in mind: the more sample points you include, the higher the computational cost. It is usually set to 8.
+Grid X: the number of cells in the horizontal direction. The more cells, the finer the grid, the higher the dimensionality of the resulting feature vector. It is usually set to 8.
+Grid Y: the number of cells in the vertical direction. The more cells, the finer the grid, the higher the dimensionality of the resulting feature vector. It is usually set to 8.
+    # some another algothim
+    # class  	cv::face::BasicFaceRecognizer
+    # class  	cv::face::EigenFaceRecognizer
+    # class  	cv::face::FisherFaceRecognizer
+    # class  	cv::face::LBPHFaceRecognizer
+'''

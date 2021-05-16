@@ -39,24 +39,21 @@ class DetectedUser:
         self.secondFrame = jra.Frame(self.canvas)
         self.canvas.create_window((0, 0), window=self.secondFrame, anchor="nw")
         self.secondFrame.bind('<Configure>', self.on_configure)
-
         self.list_buttons = []
         self.list_images = []
 
         self.row = 0
         self.column = 0
+        self.image = ImageTk.PhotoImage(Image.open("View/Stock/homepagepic.png").resize((600, 600), Image.ANTIALIAS))
+        self.camera_real_time.create_image(0, 0, anchor=jra.NW, image=self.image)
 
         self.scrool_bar.pack(side=jra.RIGHT, fill=jra.Y)
         self.master.withdraw()
 
-
     def update_image(self,frame):
         # Get the latest frame and convert image format
-        # self.image = frame
-        print(frame)
-        self.image = frame
-        self.image = Image.fromarray(self.image)  # to PIL format
-        self.image = ImageTk.PhotoImage(self.image)  # to ImageTk format
+        # change to PIL format by Image from array first and then change to ImageTk format
+        self.image = ImageTk.PhotoImage(Image.fromarray(frame))
         # Update image
         self.camera_real_time.create_image(0, 0, anchor=jra.NW, image=self.image)
 
