@@ -28,7 +28,9 @@ def start_capture(name):
         ret, frame = cap.read()
         cv2.imshow("real", frame)
         if face_cropped(frame) is not None:
-            # resize if you want to use another camera (reduce the size of data)
+            # All images must have the same size.
+            # The labels are used as IDs for the images,
+            # so if you have more than one image of the same texture/subject, the labels should be the same.
             face = cv2.resize(face_cropped(frame), (200, 200))
             # face = face_cropped(frame)
             face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)

@@ -26,11 +26,12 @@ class Detector(Thread):
         # List recognizer
         self.recognizer = []
         # List value confidence after 1 frame
-
+        self.num_of_user = 0
         self.frame = None
         self.font = cv2.FONT_HERSHEY_PLAIN
         self.face_cascade = cv2.CascadeClassifier('Model/data/haarcascade_frontalface_default.xml')
         self.gray_face_list = []
+        self.is_out_of_time = False
 
     def run(self):
         self.main_app()
@@ -49,7 +50,7 @@ class Detector(Thread):
             #   if the diff is lower than the threshold defined.
             # read detail here -> https://towardsdatascience.com/face-recognition-how-lbph-works-90ec258c3d6b
             id, diff = self.recognizer[index_perdict].predict(gray_face)
-            # diff is distance distance between the two histograms (original is confidence)
+            # diff is distance distance between the Feature extracted and the pic histogram
             numpy_confidence_temp[indexFace][index_perdict] = int(diff)
             # use numpy to pack our value where index is the same with self.list user
 
@@ -65,11 +66,11 @@ class Detector(Thread):
         cv2.imwrite("View/Detected/" + user_id + ".jpg", self.frame)
         # add a new UI button right here
         self.menu_UI.add_detected_user(user_id)
-
         # save that frame to show later
         self.list_users.pop(index_min)
         self.recognizer.pop(index_min)
         # pop that user out so the program will be smoother
+        self.menu_UI.update_detected_text(num_of_list=self.num_of_user,num_of_left=len(self.recognizer))
 
     def read_single_classifier(self, list_index):
         for index_to_read in list_index:
@@ -99,6 +100,7 @@ class Detector(Thread):
         for thread_read in read_threads:
             thread_read.join()
         print("Complete Reading!")
+        self.num_of_user = len(self.list_users)
 
     def get_gray_face(self,faces,gray):
         self.gray_face_list.clear()
@@ -107,15 +109,20 @@ class Detector(Thread):
             # self.gray_face_list.append(gray_face)
             self.gray_face_list.append(gray[y:y + h, x:x + w])
 
+    def stop_detect(self):
+        self.is_out_of_time = True
+
     def main_app(self):
         self.read_necessary_classifiers()
         # to show dectected employee
         self.menu_UI.open_dectect_UI()
+        # show num of employee on the screen
+        self.menu_UI.update_detected_text(num_of_list=self.num_of_user,num_of_left=len(self.recognizer))
         # use this line of code for detect from video
-        cap = cv2.VideoCapture("Model/data/video/BanHao.mov")
+        cap = cv2.VideoCapture("Model/data/video/dilam2.mp4")
         # cv2.CAP_DSHOW for releasing the handle to the webcam to stop warning when close
         # cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-        while True:
+        while not self.is_out_of_time:
 
             # list that have confidence of all user
             # READ FRAME
@@ -124,33 +131,34 @@ class Detector(Thread):
             # ROTATE FRAME 90 CLOCKWISE
             # self.frame = cv2.rotate(self.frame, cv2.ROTATE_90_CLOCKWISE)
 
-            if self.frame is None:
-                break
+            # if self.frame is None:
+            #     break
 
             # convert to gray
             gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
             # use CascadeClassifier to detect face from frame
             faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
 
-            self.get_gray_face(faces,gray)
-
-            # create numpy with it's detected_face dimensions
-            np_confidence = np.full((len(faces), len(self.list_users)), 100, dtype=np.int16)
-
-            # Create threads to recognize
-            # One list of thread to detect faces then predict diff between frame's face and user's face
-            threads = list()
-            for index in range(len(self.list_users)):
-                x = Thread(target=self.thread_recog, args=(index, np_confidence))
-                threads.append(x)
-                x.start()
-
-            # Wait to end all threads
-            for index, thread in enumerate(threads):
-                thread.join()
-
             # If found face then do
             if len(faces) > 0:
+
+                self.get_gray_face(faces, gray)
+
+                # create numpy with it's detected_face dimensions
+                np_confidence = np.full((len(faces), len(self.list_users)), 100, dtype=np.int16)
+
+                # Create threads to recognize
+                # One list of thread to detect faces then predict diff between frame's face and user's face
+                threads = list()
+                for index in range(len(self.list_users)):
+                    x = Thread(target=self.thread_recog, args=(index, np_confidence))
+                    threads.append(x)
+                    x.start()
+
+                # Wait to end all threads
+                for index, thread in enumerate(threads):
+                    thread.join()
+
                 for index_face, (x, y, w, h) in enumerate(faces):
                     # get min user face to start recognize
                     min_diff = np_confidence[index_face].min()
@@ -179,6 +187,7 @@ class Detector(Thread):
                             if self.list_users[index_min].counter > 100:
                                 # if detect more than 100 point frame then pop that user out and save the frame
                                 self.detected_user(index_min, x, y, w, h)
+                    print(np_confidence)
                     self.frame = cv2.rectangle(self.frame, (x, y), (x + w, y + h), colorRectangle, 2)
                     self.frame = cv2.putText(self.frame, text, (x, y - 4), self.font, 1, colorRectangle, 1, cv2.LINE_AA)
 
@@ -186,7 +195,6 @@ class Detector(Thread):
             imageRGB = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
             self.menu_UI.update_frame(imageRGB)
 
-            print(np_confidence)
             # show the result
             # if cv2.waitKey(20) & 0xFF == ord('q'):
             #     break

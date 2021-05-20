@@ -26,7 +26,6 @@ class MainUI(tk.Tk):
             z = x.rstrip().split(" ")
             for i in z:
                 names.append(i)
-        self.title_font = tkfont.Font(family='Helvetica', size=16, weight="bold")
         self.title("Face Recognizer")
         self.resizable(False, False)
         self.geometry("510x350")
@@ -67,9 +66,11 @@ class StartPage(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        self.timer_minute = 1
         new_window = tk.Toplevel(self)
-        self.DetectedWindow = DetectedUser(new_window)
+        self.DetectedWindow = DetectedUser(new_window, self)
         self.controller = controller
+        self.dec = None
         # load = Image.open("homepagepic.png")
         # load = load.resize((250, 250), Image.ANTIALIAS)
         render = PhotoImage(file='View/Stock/homepagepic.png')
@@ -77,7 +78,8 @@ class StartPage(tk.Frame):
         img.image = render
         img.grid(row=0, column=1, rowspan=4, sticky="nsew")
         self.progress_bar = ttk.Progressbar(self, orient=tk.HORIZONTAL, length=100, mode="determinate")
-        label = tk.Label(self, text="     Face Attendance     \n    Recorder System    ", font=self.controller.title_font, fg="#263942")
+        label = tk.Label(self, text="     Face Attendance     \n    Recorder System    ",
+                         font=tkfont.Font(family='Helvetica', size=16, weight="bold"), fg="#263942")
         label.grid(row=0, sticky="ew")
 
         button1 = tk.Button(self, text="   Add a user  ", fg="#ffffff", bg="#263942",
@@ -117,21 +119,28 @@ class StartPage(tk.Frame):
         if names is not None:
             print("Detecting....")
             self.progress_bar.grid(row=4, column=1, sticky="nsew")
-            dec = Detector(names,self)
-            dec.start()
+            self.dec = Detector(names,self)
+            self.dec.start()
         else:
             messagebox.showinfo("INSTRUCTIONS", "List users is empty. Let add someone first!")
 
     def open_dectect_UI(self):
         self.progress_bar.grid_forget()
         self.controller.withdraw()
-        self.DetectedWindow.show()
+
+        self.DetectedWindow.show(self.timer_minute)
+
+    def update_detected_text(self,num_of_list,num_of_left):
+        self.DetectedWindow.update_detected_text(num_of_list=num_of_list,num_of_left=num_of_left)
 
     def add_detected_user(self,user_id):
         self.DetectedWindow.add_detected_user(user_id)
 
     def update_frame(self,frame):
         self.DetectedWindow.update_image(frame)
+
+    def stop_detect(self):
+        self.dec.stop_detect()
 
 
 class PageOne(tk.Frame):
