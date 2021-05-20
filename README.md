@@ -1,20 +1,19 @@
+
 # Face Recogniton GUI-APP
-
-
+Make by : [JoeVenner](mailto:ylafrimi@gmail.com)<br>
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://www.youtube.com/channel/UCKvgGs-ALhvOq9u95PHXHNw)
 
+# Face Attendance Recorder System    
+Customize by : [PhuDinhTruong](mailto:phudinhtruongk18@gmail.com)<br>
 
-# A very Simple Gui app for Face Detection 
+
+# Simple Face Attendance Recorder System   
 
   - Collect Face Data
   - Build Face Classifier 
-  - Detecte the face
-
-#  New Features!
-
-  - Add Emotion detection
-  - Fixed image loading in Linux 
-  
+  - Detecte the faces on frame
+  - Detecte the faces on frame
+  - Recorder System
   
 # Installation
 
@@ -48,19 +47,5 @@ Capture Data From the face then train the classifier<br>
 List of all the users<br>
 ![page3](https://i.ibb.co/1KwfVVV/dropdown.png)<br>
 
-### Recognition <br>
-A webcam window will popup and start recognition proccess<br>
-![page4](https://i.ibb.co/sCtgDDC/4page.png)<br>
->![Face Recognition](https://i.ibb.co/bNpC5wR/jack.png)<br>
->![emotion](https://i.ibb.co/F7pdtjZ/emotion.png)<br>
->![Age and Gender](https://i.ibb.co/9q1L7sD/age.png)<br>
-
-
-
-<br><br>
-
-Made By ❤ : [JoeVenner](mailto:ylafrimi@gmail.com)<br>
+<br>
 **Free Software, Hell Yeah!**
-
-
-
