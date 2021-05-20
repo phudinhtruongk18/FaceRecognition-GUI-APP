@@ -1,5 +1,5 @@
-Model\data\classifiers\
-Model\data\DataLoi\
-Model\data\DataThieu\
-Model\data\users_photos\
-Model\data\video\
+Model\data\classifiers\*
+Model\data\DataLoi\*
+Model\data\DataThieu\*
+Model\data\users_photos\*
+Model\data\video\*
