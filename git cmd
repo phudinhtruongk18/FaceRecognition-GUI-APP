@@ -1,9 +1,9 @@
 git add *
-git rm -r --cached ./Model/data/classifiers/
-git rm -r --cached ./Model/data/users_photos/
-git rm -r --cached ./Model/data/video/
-git rm -r --cached ./Model/data/DataLoi/
-git rm -r --cached ./Model/data/DataThieu/
+git rm -r --cached ./Model/data/classifiers/*
+git rm -r --cached ./Model/data/users_photos/*
+git rm -r --cached ./Model/data/video/*
+git rm -r --cached ./Model/data/DataLoi/*
+git rm -r --cached ./Model/data/DataThieu/*
 
 git commit -m "ignoring data and update readme!"
 
