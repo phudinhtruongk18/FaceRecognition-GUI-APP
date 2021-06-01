@@ -1,5 +1,3 @@
-import os
-
 from View.DetectedUser import DetectedUser
 from View.Detector import Detector
 from Model.train_all_classifiers import train_all_classifers
@@ -13,7 +11,6 @@ from tkinter import messagebox, PhotoImage
 # from gender_prediction import emotion,age And gender
 
 names = []
-curentDir = os.curdir
 
 
 class MainUI(tk.Tk):
@@ -119,24 +116,24 @@ class StartPage(tk.Frame):
         if names is not None:
             print("Detecting....")
             self.progress_bar.grid(row=4, column=1, sticky="nsew")
-            self.dec = Detector(names,self)
+            self.dec = Detector(names, self)
             self.dec.start()
         else:
             messagebox.showinfo("INSTRUCTIONS", "List users is empty. Let add someone first!")
 
-    def open_dectect_UI(self):
+    def open_detect_UI(self):
         self.progress_bar.grid_forget()
         self.controller.withdraw()
 
         self.DetectedWindow.show(self.timer_minute)
 
-    def update_detected_text(self,num_of_list,num_of_left):
-        self.DetectedWindow.update_detected_text(num_of_list=num_of_list,num_of_left=num_of_left)
+    def update_detected_text(self, num_of_list, num_of_left):
+        self.DetectedWindow.update_detected_text(num_of_list=num_of_list, num_of_left=num_of_left)
 
-    def add_detected_user(self,user_id):
+    def add_detected_user(self, user_id):
         self.DetectedWindow.add_detected_user(user_id)
 
-    def update_frame(self,frame):
+    def update_frame(self, frame):
         self.DetectedWindow.update_image(frame)
 
     def stop_detect(self):
@@ -151,11 +148,11 @@ class PageOne(tk.Frame):
                                                                                            padx=5)
         self.student_name = tk.Entry(self, borderwidth=3, bg="lightgrey", font='Helvetica 11')
         self.student_name.grid(row=0, column=1, pady=10, padx=10)
-        self.buttoncanc = tk.Button(self, text="Cancel", bg="#ffffff", fg="#263942",
-                                    command=lambda: controller.show_frame("StartPage"))
-        self.buttonext = tk.Button(self, text="Next", fg="#ffffff", bg="#263942", command=self.start_training)
-        self.buttoncanc.grid(row=1, column=0, pady=10, ipadx=5, ipady=4)
-        self.buttonext.grid(row=1, column=1, pady=10, ipadx=5, ipady=4)
+        self.button_cancel = tk.Button(self, text="Cancel", bg="#ffffff", fg="#263942",
+                                       command=lambda: controller.show_frame("StartPage"))
+        self.button_next = tk.Button(self, text="Next", fg="#ffffff", bg="#263942", command=self.start_training)
+        self.button_cancel.grid(row=1, column=0, pady=10, ipadx=5, ipady=4)
+        self.button_next.grid(row=1, column=1, pady=10, ipadx=5, ipady=4)
 
     def start_training(self):
         global names
@@ -183,30 +180,23 @@ class PageTwo(tk.Frame):
         self.controller = controller
         tk.Label(self, text="Select user", fg="#263942", font='Helvetica 12 bold').grid(row=0, column=0, padx=10,
                                                                                         pady=10)
-        self.buttoncanc = tk.Button(self, text="Cancel", command=lambda: controller.show_frame("StartPage"),
-                                    bg="#ffffff", fg="#263942")
-        self.menuvar = tk.StringVar(self)
-        self.dropdown = tk.OptionMenu(self, self.menuvar, *names)
+        self.button_cancel = tk.Button(self, text="Cancel", command=lambda: controller.show_frame("StartPage"),
+                                       bg="#ffffff", fg="#263942")
+        self.menu_var = tk.StringVar(self)
+        self.dropdown = tk.OptionMenu(self, self.menu_var, *names)
         self.dropdown.config(bg="lightgrey")
         self.dropdown["menu"].config(bg="lightgrey")
-        self.buttonext = tk.Button(self, text="Next", command=self.nextfoo, fg="#ffffff", bg="#263942")
+        self.button_next = tk.Button(self, text="Next", command=self.next_foo, fg="#ffffff", bg="#263942")
         self.dropdown.grid(row=0, column=1, ipadx=8, padx=10, pady=10)
-        self.buttoncanc.grid(row=1, ipadx=5, ipady=4, column=0, pady=10)
-        self.buttonext.grid(row=1, ipadx=5, ipady=4, column=1, pady=10)
+        self.button_cancel.grid(row=1, ipadx=5, ipady=4, column=0, pady=10)
+        self.button_next.grid(row=1, ipadx=5, ipady=4, column=1, pady=10)
 
-    def nextfoo(self):
-        if self.menuvar.get() == "None":
+    def next_foo(self):
+        if self.menu_var.get() == "None":
             messagebox.showerror("ERROR", "Name cannot be 'None'")
             return
-        self.controller.active_name = self.menuvar.get()
+        self.controller.active_name = self.menu_var.get()
         self.controller.show_frame("StartPage")
-
-    def refresh_names(self):
-        global names
-        self.menuvar.set('')
-        self.dropdown['menu'].delete(0, 'end')
-        for name in names:
-            self.dropdown['menu'].add_command(label=name, command=tk._setit(self.menuvar, name))
 
 
 class PageThree(tk.Frame):
@@ -215,26 +205,27 @@ class PageThree(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
         self.controller.num_of_images = 0
-        self.numimglabel = tk.Label(self, text="Number of images captured = 0", font='Helvetica 12 bold', fg="#263942")
-        self.numimglabel.grid(row=0, column=0, columnspan=2, sticky="ew", pady=10)
-        self.capturebutton = tk.Button(self, text="Capture Data Set", fg="#ffffff", bg="#263942", command=self.capimg)
-        self.backtomenu = tk.Button(self, text="  Back To Menu  ", fg="#ffffff", bg="#263942", command=self.showmenu)
-        self.trainbutton = tk.Button(self, text="Train the model of this user", fg="#ffffff", bg="#263942", command=self.trainmodel)
-        self.capturebutton.grid(row=1, column=0, ipadx=5, ipady=4, padx=10, pady=20)
-        self.trainbutton.grid(row=1, column=1, ipadx=5, ipady=4, padx=10, pady=20)
+        self.num_label = tk.Label(self, text="Number of images captured = 0", font='Helvetica 12 bold', fg="#263942")
+        self.num_label.grid(row=0, column=0, columnspan=2, sticky="ew", pady=10)
+        self.capture_button = tk.Button(self, text="Capture Data Set", fg="#ffffff",
+                                        bg="#263942", command=self.capturing)
+        self.back_to_menu = tk.Button(self, text="  Back To Menu  ", fg="#ffffff", bg="#263942", command=self.show_menu)
+        self.train_button = tk.Button(self, text="Train the model of this user", fg="#ffffff", bg="#263942",
+                                      command=self.train_model)
+        self.capture_button.grid(row=1, column=0, ipadx=5, ipady=4, padx=10, pady=20)
+        self.train_button.grid(row=1, column=1, ipadx=5, ipady=4, padx=10, pady=20)
 
-    def capimg(self):
+    def capturing(self):
         messagebox.showinfo("INSTRUCTIONS", "Wait to capture 300 pic of your Face.")
         x = start_capture(self.controller.active_name)
         self.controller.num_of_images = x
-        self.numimglabel.config(text=str("Number of images captured = " + str(x) + ". Let retrain your dataset now!"))
-        self.backtomenu.grid(row=2, column=0, ipadx=5, ipady=4, padx=10, pady=20)
+        self.num_label.config(text=str("Number of images captured = " + str(x) + ". Let retrain your dataset now!"))
+        self.back_to_menu.grid(row=2, column=0, ipadx=5, ipady=4, padx=10, pady=20)
 
-
-    def showmenu(self):
+    def show_menu(self):
         self.controller.show_frame("StartPage")
 
-    def trainmodel(self):
+    def train_model(self):
         if self.controller.num_of_images <= 0:
             messagebox.showinfo("INSTRUCTIONS", "Let take some photos!")
         elif 200 > self.controller.num_of_images > 0:
@@ -249,31 +240,3 @@ class PageThree(tk.Frame):
             train_one_classifer(self.controller.active_name)
             messagebox.showinfo("SUCCESS", "The model has been successfully trained!")
             self.controller.show_frame("StartPage")
-
-
-# class PageFour(tk.Frame):
-#
-#     def __init__(self, parent, controller):
-#         tk.Frame.__init__(self, parent)
-#         self.controller = controller
-#
-#         label = tk.Label(self, text="Face Recognition", font='Helvetica 16 bold')
-#         label.grid(row=0, column=0, sticky="ew")
-#         button1 = tk.Button(self, text="Face Recognition", command=self.openwebcam, fg="#ffffff", bg="#263942")
-#         # button2 = tk.Button(self, text="Emotion Detection", command=self.emot, fg="#ffffff", bg="#263942")
-#         # button3 = tk.Button(self, text="Gender and Age Prediction", command=self.gender_age_pred, fg="#ffffff", bg="#263942")
-#         button4 = tk.Button(self, text="Go to Home Page", command=lambda: self.controller.show_frame("StartPage"),
-#                             bg="#ffffff", fg="#263942")
-#         button1.grid(row=1, column=0, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
-#         # button2.grid(row=1,column=1, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
-#         # button3.grid(row=2,column=0, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
-#         button4.grid(row=1, column=1, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
-#
-#     def openwebcam(self):
-#         print(self.controller.list_users)
-#         dec = detector(self.controller.list_users)
-#         dec.main_app()
-# def gender_age_pred(self):
-#  ageAndgender()
-# def emot(self):
-#   emotion()

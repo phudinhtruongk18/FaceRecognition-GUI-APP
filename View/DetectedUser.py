@@ -5,7 +5,7 @@ from PIL import ImageTk, Image
 
 
 class DetectedUser:
-    def __init__(self, master_temp,menuUI):
+    def __init__(self, master_temp, menuUI):
         self.menuUI = menuUI
         self.master = master_temp
         self.master.title("Detected User")
@@ -45,8 +45,8 @@ class DetectedUser:
         self.backup_button = jra.Button(self.right_frame, text="Backup Button", width=30, height=1)
         self.backup_button.configure(bg="#eabf9f", font=font)
         self.backup_button.grid(row=4, column=0)
-        self.exit_button = jra.Button(self.right_frame, text="Exit", width=30, height=1)
-        self.exit_button.configure(bg="#eabf9f", font=font,command=self.stop_detect)
+        self.exit_button = jra.Button(self.right_frame, text="Stop session", width=30, height=1)
+        self.exit_button.configure(bg="#eabf9f", font=font, command=self.stop_detect)
         self.exit_button.grid(row=5, column=0)
 
         self.left_frame = jra.Frame(self.ROOT_FRAME)
@@ -54,9 +54,9 @@ class DetectedUser:
         self.canvas = jra.Canvas(self.left_frame, width=1242, height=hCanvas - 50, bg="#faf3e0")
         # self.canvas = jra.Canvas(self.left_frame)
         self.canvas.pack(side=jra.LEFT, fill=jra.BOTH, expand=1)
-        self.scrool_bar = ttk.Scrollbar(self.left_frame, orient=jra.VERTICAL, command=self.canvas.yview)
-        self.scrool_bar.pack(side=jra.RIGHT, fill=jra.Y)
-        self.canvas.configure(yscrollcommand=self.scrool_bar.set)
+        self.scroll_bar = ttk.Scrollbar(self.left_frame, orient=jra.VERTICAL, command=self.canvas.yview)
+        self.scroll_bar.pack(side=jra.RIGHT, fill=jra.Y)
+        self.canvas.configure(yscrollcommand=self.scroll_bar.set)
         self.canvas.bind_all("<MouseWheel>", self.on_mouse_scroll)
         self.secondFrame = jra.Frame(self.canvas)
         self.canvas.create_window((0, 0), window=self.secondFrame, anchor="nw")
@@ -69,17 +69,17 @@ class DetectedUser:
         self.image = ImageTk.PhotoImage(Image.open("View/Stock/homepagepic.png").resize((600, 600), Image.ANTIALIAS))
         self.camera_real_time.create_image(0, 0, anchor=jra.NW, image=self.image)
 
-        self.scrool_bar.pack(side=jra.RIGHT, fill=jra.Y)
+        self.scroll_bar.pack(side=jra.RIGHT, fill=jra.Y)
         self.master.withdraw()
 
         self.timeBegin = 0
         self.timer_second = 0
-        self.update_clock()
+        self.button_size = 300
 
     def update_clock(self):
-        # simple counter update after every second
+        # simple time counter update after every second
         now = time.perf_counter()
-        self.time_left.configure(text=int(self.timer_second-(now - self.timeBegin)))
+        self.time_left.configure(text=int(self.timer_second - (now - self.timeBegin)))
         self.master.after(1000, self.update_clock)
 
     def update_detected_text(self, num_of_list, num_of_left):
@@ -92,18 +92,42 @@ class DetectedUser:
         # change to PIL format by Image from array first and then change to ImageTk format
         self.image = ImageTk.PhotoImage(Image.fromarray(frame))
         # Update image
-        self.camera_real_time.create_image(0, 0, anchor=jra.NW, image=self.image)
+        try:
+            self.camera_real_time.create_image(0, 0, anchor=jra.NW, image=self.image)
+        except Exception as e:
+            print("Update Realtime fail ", e)
 
     def stop_detect(self):
+        # stop detecting in Detector
         self.menuUI.stop_detect()
+        # reset for new session
+        self.reset_data()
+        # hide this window
+        self.master.withdraw()
+        # show up menuUI
+        self.menuUI.controller.deiconify()
 
-    def show(self,timer):
+    def reset_data(self):
+        # Un grid all image of old session
+        for temp_button in self.list_buttons:
+            temp_button.grid_forget()
+        # Clear 2 old lists
+        self.list_buttons.clear()
+        self.list_images.clear()
+        # Set row and column 0 for new record session
+        self.row = 0
+        self.column = 0
+
+    def show(self, timer):
         # minutes to seconds
-        self.timer_second = timer*60
+        self.timer_second = timer * 60
         self.timeBegin = time.perf_counter()
+        # show this window
         self.master.deiconify()
+        # start counting down
+        self.update_clock()
 
-    def on_configure(self, event=None):
+    def on_configure(self, _):
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
 
     def on_mouse_scroll(self, event):
@@ -112,17 +136,20 @@ class DetectedUser:
     def get_right_size(self, wi, he):
         ratio = wi / he
         if ratio > 0:
-            he, wi = 300, 300 * ratio
+            he, wi = self.button_size, self.button_size * ratio
         else:
-            wi, he = 300, 300 * ratio
+            wi, he = self.button_size, self.button_size * ratio
         return int(wi), int(he)
 
     def add_detected_user(self, user_id):
+        # get employee photo
         link_user = "View/Detected/" + user_id + ".jpg"
         user_pic = Image.open(link_user)
-        # get right size of user picture and resize to make it look good
+        # get right size of user picture and resize to make it good looking and fit to the button
         img = ImageTk.PhotoImage(user_pic.resize(self.get_right_size(user_pic.width, user_pic.height), Image.ANTIALIAS))
+        # add to self.list_images -> make it visible (I have tried make it simpler but it doesn't work)
         self.list_images.append(img)
+        # do some math to grid in this window
         index = self.list_images.__len__() - 1
         button = jra.Button(self.secondFrame, image=self.list_images[index], width=300, height=300, bg="#faf3e0")
         self.list_buttons.append(button)
@@ -130,5 +157,6 @@ class DetectedUser:
             self.column = 0
             self.row += 1
         self.column += 1
-        self.list_buttons.append(button)
         button.grid(row=self.row, column=self.column)
+        # add to list_buttons -> take control this button
+        self.list_buttons.append(button)

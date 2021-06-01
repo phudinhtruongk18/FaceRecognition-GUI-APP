@@ -49,7 +49,7 @@ class Detector(Thread):
             # We can assume that the algorithm has successfully recognized
             #   if the diff is lower than the threshold defined.
             # read detail here -> https://towardsdatascience.com/face-recognition-how-lbph-works-90ec258c3d6b
-            id, diff = self.recognizer[index_perdict].predict(gray_face)
+            ID, diff = self.recognizer[index_perdict].predict(gray_face)
             # diff is distance distance between the Feature extracted and the pic histogram
             numpy_confidence_temp[indexFace][index_perdict] = int(diff)
             # use numpy to pack our value where index is the same with self.list user
@@ -60,8 +60,8 @@ class Detector(Thread):
         self.frame = cv2.putText(self.frame, str(datetime.now().time()), (x, y - 20), self.font, 1, COLOR_FACE_COMPLETE,
                                  1,
                                  cv2.LINE_AA)
-        self.frame = cv2.putText(self.frame, user_id + " Detect complete !", (x, y - 4), self.font, 1, COLOR_FACE_COMPLETE, 1,
-                                 cv2.LINE_AA)
+        self.frame = cv2.putText(self.frame, user_id + " Detect complete !", (x, y - 4), self.font, 1,
+                                 COLOR_FACE_COMPLETE, 1, cv2.LINE_AA)
         # get name of customer and write on the frame
         cv2.imwrite("View/Detected/" + user_id + ".jpg", self.frame)
         # add a new UI button right here
@@ -70,7 +70,7 @@ class Detector(Thread):
         self.list_users.pop(index_min)
         self.recognizer.pop(index_min)
         # pop that user out so the program will be smoother
-        self.menu_UI.update_detected_text(num_of_list=self.num_of_user,num_of_left=len(self.recognizer))
+        self.menu_UI.update_detected_text(num_of_list=self.num_of_user, num_of_left=len(self.recognizer))
 
     def read_single_classifier(self, list_index):
         for index_to_read in list_index:
@@ -102,7 +102,7 @@ class Detector(Thread):
         print("Complete Reading!")
         self.num_of_user = len(self.list_users)
 
-    def get_gray_face(self,faces,gray):
+    def get_gray_face(self, faces, gray):
         self.gray_face_list.clear()
         for indexFace, (x, y, w, h) in enumerate(faces):
             # gray_face = gray[y:y + h, x:x + w]
@@ -114,14 +114,14 @@ class Detector(Thread):
 
     def main_app(self):
         self.read_necessary_classifiers()
-        # to show dectected employee
-        self.menu_UI.open_dectect_UI()
+        # to show detected employee
+        self.menu_UI.open_detect_UI()
         # show num of employee on the screen
-        self.menu_UI.update_detected_text(num_of_list=self.num_of_user,num_of_left=len(self.recognizer))
+        self.menu_UI.update_detected_text(num_of_list=self.num_of_user, num_of_left=len(self.recognizer))
         # use this line of code for detect from video
-        cap = cv2.VideoCapture("Model/data/video/dilam2.mp4")
+        # cap = cv2.VideoCapture("Model/data/video/dilam2.mp4")
         # cv2.CAP_DSHOW for releasing the handle to the webcam to stop warning when close
-        # cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         while not self.is_out_of_time:
 
             # list that have confidence of all user
