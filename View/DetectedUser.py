@@ -126,7 +126,7 @@ class DetectedUser:
         index = self.list_images.__len__() - 1
         button = jra.Button(self.secondFrame, image=self.list_images[index], width=300, height=300, bg="#faf3e0")
         self.list_buttons.append(button)
-        if self.column == 3:
+        if self.column == 4:
             self.column = 0
             self.row += 1
         self.column += 1

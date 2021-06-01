@@ -4,3 +4,4 @@ Pillow==7.1.2
 h5py==2.10.0
 imutils==0.5.3
 
+tkinter==8.6

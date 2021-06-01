@@ -26,7 +26,7 @@ class MainUI(tk.Tk):
             z = x.rstrip().split(" ")
             for i in z:
                 names.append(i)
-        self.title("Face Recognizer")
+        self.title("Simple Face Attendance Recorder System")
         self.resizable(False, False)
         self.geometry("510x350")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -277,4 +277,3 @@ class PageThree(tk.Frame):
 #  ageAndgender()
 # def emot(self):
 #   emotion()
-
