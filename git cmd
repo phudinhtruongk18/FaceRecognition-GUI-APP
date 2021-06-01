@@ -5,6 +5,12 @@ git rm -r --cached ./Model/data/video/*
 git rm -r --cached ./Model/data/DataLoi/*
 git rm -r --cached ./Model/data/DataThieu/*
 
+git add ./Model/data/classifiers/PhuDinh_classifier.xml
+git add ./Model/data/users_photos/phu
+git add ./Model/data/video/me2.mp4
+git add ./Model/data/DataLoi/PhapThanh/0PhapThanh.jpg
+git add ./Model/data/DataThieu/TrongNhan/0TrongNhan.jpg
+
 git commit -m "ignoring data and update readme!"
 
 git push
