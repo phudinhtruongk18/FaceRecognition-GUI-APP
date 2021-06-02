@@ -121,25 +121,25 @@ class StartPage(tk.Frame):
         else:
             messagebox.showinfo("INSTRUCTIONS", "List users is empty. Let add someone first!")
 
-    def detected_user_from_detector(self,id_to_check):
+    def detected_user_from_detector(self, id_to_check):
+        # this method
+        # return isRecorded = false and Index if employee ID non attendance yet
+        # return isRecorded = true and id_name if employee ID attendance already
+        # return None and None if ID doesn't exist in system
+
         # return index of the user
-        checked_id = self.dec.find_index_of_users(id_to_check)
+        found_index = self.dec.find_index_of_users(id_to_check)
         # if this id in Detector
-        if checked_id is not None:
-            return checked_id
+        if found_index is not None:
+            return False, found_index
         # if this id not in Detector check again in Loaded Employee list
         else:
-            if checked_id not in names:
+            if id_to_check not in names:
                 # if this id not in Loaded Employee so -> this ID doesn't exist in system
-                return None
+                return None, None
             else:
                 # if this id Loaded Employee so -> this ID already check in by face ID before.
-                # So i choose to add this Employee in Detector again and recheck this Employee ONE MORE TIME
-                self.dec.add_backup_user(id_to_check)
-                checked_id_second = self.dec.find_index_of_users(id_to_check)
-                messagebox.showinfo("This Employee already check in before!")
-                return checked_id_second
-
+                return True, id_to_check
 
     def open_detect_UI(self):
         self.progress_bar.grid_forget()

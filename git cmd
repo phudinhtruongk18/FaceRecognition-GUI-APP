@@ -14,7 +14,6 @@ git add ./Model/data/video/me2.mp4
 git add ./Model/data/WrongData/PhapThanh/0PhapThanh.jpg
 git add ./Model/data/NotEnoughData/TrongNhan/0TrongNhan.jpg
 
-git commit -m "Update some backup and di an com"
+git commit -m "Try some "
 
 git push
-

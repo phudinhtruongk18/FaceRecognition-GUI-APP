@@ -1,5 +1,5 @@
 import time
-from tkinter import ttk
+from tkinter import ttk, messagebox
 import tkinter as jra
 from PIL import ImageTk, Image
 
@@ -82,7 +82,36 @@ class DetectedUser:
         self.button_size = 300
 
     def backup_plan(self):
-        self.menuUI.detected_user_from_detector("phu")
+        # plan is get text from this small box and do some research in some list and backup them by data and image
+        # get this done and change button -> button with some lines of text
+        self.OpenMyOwnBox()
+        # isRecorded = false and Index if employee ID non attendance yet
+        # isRecorded = true and id_name if employee ID attendance already
+        # None and None if ID doesn't exist in system
+        isRecorded,IDorName = self.menuUI.detected_user_from_detector("BanPhu")
+        if isRecorded is None:
+            messagebox.showinfo(" Try Again!","Your ID doesn't exist!")
+        else:
+            if isRecorded:
+                messagebox.showinfo("Phu"+" Da den!", "Your ID look fuk!")
+            if not isRecorded:
+                messagebox.showinfo("Phu"+" chua den!", "Your ID í like new!")
+
+    def OpenMyOwnBox(self, event=None):
+        newWindow = jra.Toplevel(self.master)
+        newWindow.title("Cua so cua toi.")
+        w = 250
+        h = 150
+        ws = self.master.winfo_screenwidth()
+        hs = self.master.winfo_screenheight()
+        x = w
+        y = (hs / 2) - (h / 2) - 150
+        newWindow.geometry('%dx%d+%d+%d' % (w, h, x, y))
+        text = str("jello world")
+        entryThemGhiChu = jra.Entry(newWindow, text=text, bg="#979974")
+        entryThemGhiChu.pack()
+        xacNhan = jra.Button(newWindow, text="Xác Nhận", bg="#3BC488", command=newWindow.destroy)
+        xacNhan.pack()
 
     def update_clock(self):
         # simple time counter update after every second

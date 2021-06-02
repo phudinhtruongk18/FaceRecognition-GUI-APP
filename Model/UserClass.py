@@ -11,6 +11,7 @@ class ListUserDetector(list):
     def find_index_by_id(self,id_to_check):
         for index,temp_user in enumerate(self):
             if temp_user.name == id_to_check:
+                print(temp_user,id_to_check,"found")
                 return index
         return None
 
