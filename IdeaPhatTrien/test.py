@@ -26,21 +26,21 @@
 # arrayConfidence[1][3] = 7
 # print(arrayConfidence[0].argmin())
 
-from tkinter import *
-from PIL import ImageTk, Image
-import cv2
-
-
-root = Tk()
-# Create a frame
-app = Frame(root, bg="white")
-app.grid()
-# Create a label in the frame
-lmain = Label(app)
-lmain.grid()
-
-# Capture from camera
-cap = cv2.VideoCapture(0)
+# from tkinter import *
+# from PIL import ImageTk, Image
+# import cv2
+#
+#
+# root = Tk()
+# # Create a frame
+# app = Frame(root, bg="white")
+# app.grid()
+# # Create a label in the frame
+# lmain = Label(app)
+# lmain.grid()
+#
+# # Capture from camera
+# cap = cv2.VideoCapture(0)
 
 # function for video streaming
 # def video_stream():
@@ -61,3 +61,7 @@ cap = cv2.VideoCapture(0)
 
 #!/usr/bin/env python
 
+listt = [1,3,6,2,32,32,3,42,7]
+
+if 32 in listt:
+    print(listt.index(32))

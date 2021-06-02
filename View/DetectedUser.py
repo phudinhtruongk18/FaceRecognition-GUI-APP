@@ -8,9 +8,14 @@ class DetectedUser:
     def __init__(self, master_temp, menuUI):
         self.menuUI = menuUI
         self.master = master_temp
+        # self.master.resizable(1, 1)
+
         self.master.title("Detected User")
-        w = 1920
-        hCanvas = 1080
+        w, h = self.master.winfo_screenwidth(), self.master.winfo_screenheight()
+
+        # w = 1920
+        # hCanvas = 1060
+        hCanvas = h - 27
         self.master.geometry("{0}x{1}+0+0".format(w, hCanvas))
 
         style = ttk.Style()
@@ -21,7 +26,7 @@ class DetectedUser:
         self.ROOT_FRAME.grid(row=0, column=0)
         self.right_frame = ttk.Frame(self.ROOT_FRAME)
         self.right_frame.grid(row=0, column=1, sticky=jra.N)
-        self.camera_real_time = jra.Canvas(self.right_frame, width=640, height=640, bg="#faf3e0")
+        self.camera_real_time = jra.Canvas(self.right_frame, width=int(w/3), height=int(h*6/10), bg="#faf3e0")
         self.camera_real_time.grid(row=0, column=0)
 
         self.canvas_the_packer = jra.Canvas(self.right_frame)
@@ -43,7 +48,7 @@ class DetectedUser:
         self.employee_left.grid(row=2, column=1)
 
         self.backup_button = jra.Button(self.right_frame, text="Backup Button", width=30, height=1)
-        self.backup_button.configure(bg="#eabf9f", font=font)
+        self.backup_button.configure(bg="#eabf9f", font=font, command=self.backup_plan)
         self.backup_button.grid(row=4, column=0)
         self.exit_button = jra.Button(self.right_frame, text="Stop session", width=30, height=1)
         self.exit_button.configure(bg="#eabf9f", font=font, command=self.stop_detect)
@@ -51,7 +56,7 @@ class DetectedUser:
 
         self.left_frame = jra.Frame(self.ROOT_FRAME)
         self.left_frame.grid(row=0, column=2)
-        self.canvas = jra.Canvas(self.left_frame, width=1242, height=hCanvas - 50, bg="#faf3e0")
+        self.canvas = jra.Canvas(self.left_frame, width=int(w*6/10), height=hCanvas - 50, bg="#faf3e0")
         # self.canvas = jra.Canvas(self.left_frame)
         self.canvas.pack(side=jra.LEFT, fill=jra.BOTH, expand=1)
         self.scroll_bar = ttk.Scrollbar(self.left_frame, orient=jra.VERTICAL, command=self.canvas.yview)
@@ -76,11 +81,17 @@ class DetectedUser:
         self.timer_second = 0
         self.button_size = 300
 
+    def backup_plan(self):
+        self.menuUI.detected_user_from_detector("phu")
+
     def update_clock(self):
         # simple time counter update after every second
         now = time.perf_counter()
-        self.time_left.configure(text=int(self.timer_second - (now - self.timeBegin)))
+        time_left = int(self.timer_second - (now - self.timeBegin))
+        self.time_left.configure(text=time_left)
         self.master.after(1000, self.update_clock)
+        if time_left < 0:
+            self.stop_detect()
 
     def update_detected_text(self, num_of_list, num_of_left):
         # num_of_left += 1

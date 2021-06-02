@@ -58,8 +58,7 @@ class Detector(Thread):
         user_id = self.list_users[index_min].name
         self.frame = cv2.rectangle(self.frame, (x, y), (x + w, y + h), COLOR_FACE_COMPLETE, 2)
         self.frame = cv2.putText(self.frame, str(datetime.now().time()), (x, y - 20), self.font, 1, COLOR_FACE_COMPLETE,
-                                 1,
-                                 cv2.LINE_AA)
+                                 1, cv2.LINE_AA)
         self.frame = cv2.putText(self.frame, user_id + " Detect complete !", (x, y - 4), self.font, 1,
                                  COLOR_FACE_COMPLETE, 1, cv2.LINE_AA)
         # get name of customer and write on the frame
@@ -112,6 +111,12 @@ class Detector(Thread):
     def stop_detect(self):
         self.is_out_of_time = True
 
+    def add_backup_user(self, id_to_add):
+        self.list_users.add_backup_user(id_to_add)
+
+    def find_index_of_users(self, id_to_check):
+        return self.list_users.find_index_by_id(id_to_check=id_to_check)
+
     def main_app(self):
         self.read_necessary_classifiers()
         # to show detected employee
@@ -119,9 +124,9 @@ class Detector(Thread):
         # show num of employee on the screen
         self.menu_UI.update_detected_text(num_of_list=self.num_of_user, num_of_left=len(self.recognizer))
         # use this line of code for detect from video
-        # cap = cv2.VideoCapture("Model/data/video/dilam2.mp4")
+        cap = cv2.VideoCapture("Model/data/video/dilam2.mp4")
         # cv2.CAP_DSHOW for releasing the handle to the webcam to stop warning when close
-        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        # cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         while not self.is_out_of_time:
 
             # list that have confidence of all user
@@ -139,8 +144,8 @@ class Detector(Thread):
             # use CascadeClassifier to detect face from frame
             faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
 
-            # If found face then do
-            if len(faces) > 0:
+            # If found face and still need to record attendance then do
+            if len(faces) > 0 and self.list_users:
 
                 self.get_gray_face(faces, gray)
 
@@ -161,6 +166,8 @@ class Detector(Thread):
 
                 for index_face, (x, y, w, h) in enumerate(faces):
                     # get min user face to start recognize
+                    print(faces)
+                    print(np_confidence)
                     min_diff = np_confidence[index_face].min()
                     index_min = np_confidence[index_face].argmin()
 
