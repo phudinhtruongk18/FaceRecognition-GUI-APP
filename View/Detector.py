@@ -57,10 +57,10 @@ class Detector(Thread):
     def detected_user(self, index_min, x, y, w, h):
         user_id = self.list_users[index_min].name
         self.frame = cv2.rectangle(self.frame, (x, y), (x + w, y + h), COLOR_FACE_COMPLETE, 2)
-        self.frame = cv2.putText(self.frame, str(datetime.now().time()), (x, y - 20), self.font, 1, COLOR_FACE_COMPLETE,
-                                 1, cv2.LINE_AA)
-        self.frame = cv2.putText(self.frame, user_id + " Detect complete !", (x, y - 4), self.font, 1,
-                                 COLOR_FACE_COMPLETE, 1, cv2.LINE_AA)
+        self.frame = cv2.putText(self.frame, str(datetime.now().time())[0:5], (x, y - 50), self.font, 3,
+                                 COLOR_FACE_COMPLETE, 2, cv2.LINE_AA)
+        self.frame = cv2.putText(self.frame, user_id + "!", (x, y - 4), self.font, 3,
+                                 COLOR_FACE_COMPLETE, 2, cv2.LINE_AA)
         # get name of customer and write on the frame
         cv2.imwrite("View/Detected/" + user_id + ".jpg", self.frame)
         # add a new UI button right here
@@ -69,6 +69,39 @@ class Detector(Thread):
         self.list_users.pop(index_min)
         self.recognizer.pop(index_min)
         # pop that user out so the program will be smoother
+        self.menu_UI.update_detected_text(num_of_list=self.num_of_user, num_of_left=len(self.recognizer))
+
+    def backup_detected_user_with_index(self, index_input):
+        user_id = self.list_users[index_input].name
+        self.frame = cv2.putText(self.frame, str(datetime.now().time())[0:5], (50, 50), self.font, 2,
+                                 COLOR_FACE_COMPLETE, 2, cv2.LINE_AA)
+        self.frame = cv2.putText(self.frame, user_id, (50, 100), self.font, 2,
+                                 COLOR_FACE_COMPLETE, 2, cv2.LINE_AA)
+
+        # get name of customer and write on the frame
+        cv2.imwrite("View/Detected/index" + user_id + ".jpg", self.frame) # delete this line
+        # add a new UI button right here
+        self.menu_UI.add_detected_user("index"+user_id)
+        # save that frame to show later
+        self.list_users.pop(index_input)
+        self.recognizer.pop(index_input)
+        # pop that user out so the program will be smoother
+        self.menu_UI.update_detected_text(num_of_list=self.num_of_user, num_of_left=len(self.recognizer))
+
+    def backup_detected_user_with_id(self, id_backup):
+        self.frame = cv2.putText(self.frame, str(datetime.now().time()), (50, 50), self.font, 1, COLOR_FACE_COMPLETE,
+                                 1, cv2.LINE_AA)
+        self.frame = cv2.putText(self.frame, id_backup + " Detect complete !", (50, 100), self.font, 1,
+                                 COLOR_FACE_COMPLETE, 1, cv2.LINE_AA)
+        # get name of customer and write on the frame
+        cv2.imwrite("View/Detected/ID" + id_backup + ".jpg", self.frame) # delete this later
+        # add a new UI button right here
+        self.menu_UI.add_detected_user("ID"+id_backup)
+
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!
+        # do some method to work with data later on in this case
+
+        # save that frame to show later
         self.menu_UI.update_detected_text(num_of_list=self.num_of_user, num_of_left=len(self.recognizer))
 
     def read_single_classifier(self, list_index):

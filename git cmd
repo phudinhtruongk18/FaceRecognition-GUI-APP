@@ -6,7 +6,7 @@ git rm -r --cached ./Model/data/WrongData/*
 git rm -r --cached ./Model/data/NotEnoughData/*
 git rm -r --cached ./Model/data/NotForNow/*
 
-git rm -r --cached ./idea/*
+git rm -r --cached .idea/
 
 git add ./Model/data/classifiers/PhuDinh_classifier.xml
 git add ./Model/data/users_photos/phu
@@ -14,6 +14,6 @@ git add ./Model/data/video/me2.mp4
 git add ./Model/data/WrongData/PhapThanh/0PhapThanh.jpg
 git add ./Model/data/NotEnoughData/TrongNhan/0TrongNhan.jpg
 
-git commit -m "Try some "
+git commit -m "Complete simple backup mode and update some animation  "
 
 git push

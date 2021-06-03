@@ -1,4 +1,4 @@
-from View.DetectedUser import DetectedUser
+from Controller.DetectedUser import DetectedUser
 from View.Detector import Detector
 from Model.train_all_classifiers import train_all_classifers
 from Model.create_one_new_classifier import train_one_classifer
@@ -23,9 +23,12 @@ class MainUI(tk.Tk):
             z = x.rstrip().split(" ")
             for i in z:
                 names.append(i)
-        self.title("Simple Face Attendance Recorder System")
+        self.title("Face Attendance Recorder System")
         self.resizable(False, False)
-        self.geometry("510x350")
+        ws = self.winfo_screenwidth()
+        hs = self.winfo_screenheight()
+        x, y = ws / 2 - 510 / 2, hs / 2 - 350
+        self.geometry('%dx%d+%d+%d' % (510, 350, x, y))
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.active_name = None
 
@@ -115,11 +118,18 @@ class StartPage(tk.Frame):
         global names
         if names is not None:
             print("Detecting....")
+            self.progress_bar['value'] = 0
             self.progress_bar.grid(row=4, column=1, sticky="nsew")
             self.dec = Detector(names, self)
             self.dec.start()
         else:
             messagebox.showinfo("INSTRUCTIONS", "List users is empty. Let add someone first!")
+
+    def backup_detected_user_with_index_to_detector(self, index_to_backup):
+        self.dec.backup_detected_user_with_index(index_to_backup)
+
+    def backup_detected_user_with_id_to_detector(self, id_to_backup):
+        self.dec.backup_detected_user_with_id(id_to_backup)
 
     def detected_user_from_detector(self, id_to_check):
         # this method

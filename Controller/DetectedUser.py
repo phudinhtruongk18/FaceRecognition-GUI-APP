@@ -19,14 +19,14 @@ class DetectedUser:
         self.master.geometry("{0}x{1}+0+0".format(w, hCanvas))
 
         style = ttk.Style()
-        font = ('Helvetica', 26, "bold")
-        style.configure('W.TButton', font=font, bg="#faf3e0", fg="#263942")
+        self.font = ('Helvetica', 26, "bold")
+        style.configure('W.TButton', font=self.font, bg="#faf3e0", fg="#263942")
 
         self.ROOT_FRAME = ttk.Frame(self.master, height=hCanvas, style="W.TButton")
         self.ROOT_FRAME.grid(row=0, column=0)
         self.right_frame = ttk.Frame(self.ROOT_FRAME)
         self.right_frame.grid(row=0, column=1, sticky=jra.N)
-        self.camera_real_time = jra.Canvas(self.right_frame, width=int(w/3), height=int(h*6/10), bg="#faf3e0")
+        self.camera_real_time = jra.Canvas(self.right_frame, width=int(w / 3), height=int(h * 6 / 10), bg="#faf3e0")
         self.camera_real_time.grid(row=0, column=0)
 
         self.canvas_the_packer = jra.Canvas(self.right_frame)
@@ -48,15 +48,15 @@ class DetectedUser:
         self.employee_left.grid(row=2, column=1)
 
         self.backup_button = jra.Button(self.right_frame, text="Backup Button", width=30, height=1)
-        self.backup_button.configure(bg="#eabf9f", font=font, command=self.backup_plan)
+        self.backup_button.configure(bg="#eabf9f", font=self.font, command=self.open_backup_plan)
         self.backup_button.grid(row=4, column=0)
         self.exit_button = jra.Button(self.right_frame, text="Stop session", width=30, height=1)
-        self.exit_button.configure(bg="#eabf9f", font=font, command=self.stop_detect)
+        self.exit_button.configure(bg="#eabf9f", font=self.font, command=self.stop_detect)
         self.exit_button.grid(row=5, column=0)
 
         self.left_frame = jra.Frame(self.ROOT_FRAME)
         self.left_frame.grid(row=0, column=2)
-        self.canvas = jra.Canvas(self.left_frame, width=int(w*6/10), height=hCanvas - 50, bg="#faf3e0")
+        self.canvas = jra.Canvas(self.left_frame, width=int(w * 6.5 / 10), height=hCanvas - 50, bg="#faf3e0")
         # self.canvas = jra.Canvas(self.left_frame)
         self.canvas.pack(side=jra.LEFT, fill=jra.BOTH, expand=1)
         self.scroll_bar = ttk.Scrollbar(self.left_frame, orient=jra.VERTICAL, command=self.canvas.yview)
@@ -68,6 +68,7 @@ class DetectedUser:
         self.secondFrame.bind('<Configure>', self.on_configure)
         self.list_buttons = []
         self.list_images = []
+        self.list_labels = []
 
         self.row = 0
         self.column = 0
@@ -81,37 +82,46 @@ class DetectedUser:
         self.timer_second = 0
         self.button_size = 300
 
-    def backup_plan(self):
-        # plan is get text from this small box and do some research in some list and backup them by data and image
-        # get this done and change button -> button with some lines of text
-        self.OpenMyOwnBox()
+    def backup_plan(self, id_to_backup, backup_box_temp):
+        # Get text from this small backup box and do some research in some list and backup them by the ID user input
         # isRecorded = false and Index if employee ID non attendance yet
         # isRecorded = true and id_name if employee ID attendance already
         # None and None if ID doesn't exist in system
-        isRecorded,IDorName = self.menuUI.detected_user_from_detector("BanPhu")
+        id_to_backup = str(id_to_backup)
+        isRecorded, IDorName = self.menuUI.detected_user_from_detector(id_to_backup)
         if isRecorded is None:
-            messagebox.showinfo(" Try Again!","Your ID doesn't exist!")
+            messagebox.showinfo(" Try Again!", "Your ID" + id_to_backup + " doesn't exist!")
         else:
             if isRecorded:
-                messagebox.showinfo("Phu"+" Da den!", "Your ID look fuk!")
+                self.menuUI.backup_detected_user_with_id_to_detector(IDorName)
+                # messagebox.showinfo(id_to_backup + " da den!", "Your ID look old!")
             if not isRecorded:
-                messagebox.showinfo("Phu"+" chua den!", "Your ID í like new!")
+                self.menuUI.backup_detected_user_with_index_to_detector(IDorName)
+                # messagebox.showinfo(id_to_backup + " chua den!", "Your ID look new!")
+        backup_box_temp.destroy()
 
-    def OpenMyOwnBox(self, event=None):
-        newWindow = jra.Toplevel(self.master)
-        newWindow.title("Cua so cua toi.")
-        w = 250
-        h = 150
+    # Get input ID from user and do self.backup_plan()
+    def open_backup_plan(self):
+        backup_box = jra.Toplevel(self.master)
+        backup_box.title("Backup Box")
         ws = self.master.winfo_screenwidth()
         hs = self.master.winfo_screenheight()
-        x = w
-        y = (hs / 2) - (h / 2) - 150
-        newWindow.geometry('%dx%d+%d+%d' % (w, h, x, y))
-        text = str("jello world")
-        entryThemGhiChu = jra.Entry(newWindow, text=text, bg="#979974")
-        entryThemGhiChu.pack()
-        xacNhan = jra.Button(newWindow, text="Xác Nhận", bg="#3BC488", command=newWindow.destroy)
-        xacNhan.pack()
+        w = 445
+        h = 160
+        x, y = ws / 2 - w / 2, hs / 2 - h - 50
+        backup_box.geometry('%dx%d+%d+%d' % (w, h, x, y))
+        backup_id_entry = jra.Entry(backup_box, bg="#faf3e0", font=self.font, justify='center', width=23)
+        backup_id_entry.grid(row=0, column=0, sticky="N", ipady=20)
+        packet_label = jra.Label(backup_box, bg="#faf3e0")
+        confirm_button = jra.Button(packet_label, text="Confirm", bg="#eabf9f", width=10, height=1, font=self.font,
+                                    command=lambda: self.backup_plan(backup_id_entry.get(), backup_box))
+        confirm_button.grid(row=0, column=0, sticky="SW")
+        cancel_button = jra.Button(packet_label, text="Cancel", bg="#eabf9f", width=10, height=1, font=self.font,
+                                   command=backup_box.destroy)
+        cancel_button.grid(row=0, column=1, sticky="SE")
+        packet_label.grid(row=1, column=0, sticky="S")
+        backup_id_entry.focus_set()
+        backup_id_entry.bind('<Return>', lambda event: self.backup_plan(backup_id_entry.get(), backup_box))
 
     def update_clock(self):
         # simple time counter update after every second
@@ -140,10 +150,10 @@ class DetectedUser:
     def stop_detect(self):
         # stop detecting in Detector
         self.menuUI.stop_detect()
-        # reset for new session
-        self.reset_data()
         # hide this window
         self.master.withdraw()
+        # reset for new session
+        self.reset_data()
         # show up menuUI
         self.menuUI.controller.deiconify()
 
@@ -151,7 +161,10 @@ class DetectedUser:
         # Un grid all image of old session
         for temp_button in self.list_buttons:
             temp_button.grid_forget()
+        for temp_label in self.list_labels:
+            temp_label.grid_forget()
         # Clear 2 old lists
+        self.list_labels.clear()
         self.list_buttons.clear()
         self.list_images.clear()
         # Set row and column 0 for new record session
@@ -191,12 +204,31 @@ class DetectedUser:
         self.list_images.append(img)
         # do some math to grid in this window
         index = self.list_images.__len__() - 1
+
         button = jra.Button(self.secondFrame, image=self.list_images[index], width=300, height=300, bg="#faf3e0")
-        self.list_buttons.append(button)
+        label = jra.Label(self.secondFrame, text=user_id, bg="#faf3e0", font=self.font)
         if self.column == 4:
             self.column = 0
-            self.row += 1
+            self.row += 2
         self.column += 1
+        button.bind('<Enter>', lambda event_temp: self.on_start_hover(_=event_temp,
+                                                                      button_temp=button, user_id_temp=user_id,
+                                                                      label_temp=label))
+        button.bind('<Leave>', lambda event_temp: self.on_end_hover(_=event_temp, user_id_temp=user_id,
+                                                                    button_temp=button, label_temp=label))
         button.grid(row=self.row, column=self.column)
+        label.grid(row=self.row + 1, column=self.column)
+
         # add to list_buttons -> take control this button
         self.list_buttons.append(button)
+        self.list_labels.append(label)
+
+    def on_start_hover(self, _, user_id_temp, button_temp, label_temp):
+        button_temp.configure(bg="pink")
+        print(self.font)
+        label_temp.configure(text="SHOW DETAIL INFORMATION\nabout home and life")
+
+    def on_end_hover(self, _, user_id_temp, button_temp, label_temp):
+        if self.list_buttons:
+            button_temp.configure(bg="#faf3e0")
+            label_temp.configure(text=user_id_temp)
