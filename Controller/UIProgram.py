@@ -6,9 +6,7 @@ from Model.create_dataset import start_capture
 import tkinter as tk
 from tkinter import font as tkfont, ttk
 from tkinter import messagebox, PhotoImage
-
-# from PIL import ImageTk, Image
-# from gender_prediction import emotion,age And gender
+from Controller.SelectSession import SelectSession
 
 names = []
 
@@ -69,6 +67,11 @@ class StartPage(tk.Frame):
         self.timer_minute = 1
         new_window = tk.Toplevel(self)
         self.DetectedWindow = DetectedUser(new_window, self)
+
+        new_window2 = tk.Toplevel(self)
+        self.SelectWindow = SelectSession(new_window2, self)
+        self.SelectWindow.show(5)
+
         self.controller = controller
         self.dec = None
         # load = Image.open("homepagepic.png")
@@ -76,7 +79,7 @@ class StartPage(tk.Frame):
         render = PhotoImage(file='View/Stock/homepagepic.png')
         img = tk.Label(self, image=render)
         img.image = render
-        img.grid(row=0, column=1, rowspan=4, sticky="nsew")
+        img.grid(row=0, column=1, rowspan=5, sticky="nsew")
         self.progress_bar = ttk.Progressbar(self, orient=tk.HORIZONTAL, length=100, mode="determinate")
         label = tk.Label(self, text="     Face Attendance     \n    Recorder System    ",
                          font=tkfont.Font(family='Helvetica', size=16, weight="bold"), fg="#263942")
@@ -86,15 +89,20 @@ class StartPage(tk.Frame):
                             command=lambda: self.controller.show_frame("PageOne"))
         # button2 = tk.Button(self, text="   Check a User  ", fg="#ffffff", bg="#263942",
         #                     command=lambda: self.controller.show_frame("PageTwo"))
-        button3 = tk.Button(self, text="   Retrain dataset  ", fg="#ffffff", bg="#263942", command=self.train_data)
-        button4 = tk.Button(self, text="   Recognition  ", fg="#ffffff", bg="#263942", command=self.openwebcam)
-        button5 = tk.Button(self, text="    Quit    ", fg="#263942", bg="#ffffff", command=self.on_closing)
+        button3 = tk.Button(self, text="  Retrain dataset ", fg="#ffffff", bg="#263942", command=self.train_data)
+        button4 = tk.Button(self, text="   Select Session  ", fg="#ffffff", bg="#263942", command=self.select_session)
+        button5 = tk.Button(self, text="   Start Session  ", fg="#ffffff", bg="#263942", command=self.openwebcam)
+        button6 = tk.Button(self, text="    Quit    ", fg="#263942", bg="#ffffff", command=self.on_closing)
 
         button1.grid(row=1, column=0, ipady=3, ipadx=2)
         # button2.grid(row=2, column=0, ipady=3, ipadx=2)
-        button3.grid(row=2, column=0, ipady=3, ipadx=2)
-        button4.grid(row=3, column=0, ipady=3, ipadx=2)
-        button5.grid(row=4, column=0, ipady=3, ipadx=2)
+        button3.grid(row=2, column=0, ipady=4, ipadx=2)
+        button4.grid(row=3, column=0, ipady=4, ipadx=2)
+        button5.grid(row=4, column=0, ipady=4, ipadx=2)
+        button6.grid(row=5, column=0, ipady=4, ipadx=2)
+
+    def select_session(self):
+        print("select_session")
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Are you sure?"):

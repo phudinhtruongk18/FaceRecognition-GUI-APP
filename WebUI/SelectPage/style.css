@@ -1,0 +1,157 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+.container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+}
+
+.dashboard {
+    width: 300px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgb(227, 227, 241);
+}
+
+.dashboard > h5 {
+    margin: 20px 0;
+    font-size: 26px;
+    color: rgb(58, 58, 117);
+}
+
+.dashboard > input,
+.dashboard > button {
+    margin: 20px 0;
+    width: 90%;
+    height: 40px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+}
+
+.dashboard > select {
+    cursor: pointer;
+    width: 50%;
+    height: 40px;
+    padding: 0 16px;
+    font-size: 16px;
+    background-color: white;
+}
+
+.dashboard > input {
+    padding: 0 16px;
+    font-size: 16px;
+    background-color: white;
+}
+
+.dashboard > button {
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .4);
+    background-color: rgb(209, 209, 236);
+}
+
+.view {
+    flex: 1;
+    height: fit-content;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px;
+    overflow-y: scroll;
+}
+
+.box {
+    margin: 10px;
+    width: fit-content;
+    height: fit-content;
+    box-shadow: 0 0 4px rgba(0, 0, 0, .4);
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, .1);
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+}
+
+.box > img {
+    width: 200px;
+    height: auto;
+}
+
+.box > span {
+    margin: 6px 0 2px 0;
+    width: 200px;
+    height: 30px;
+    border-radius: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    background-color: rgb(234, 234, 253);
+}
+
+@media screen and (max-width: 550px) {
+    .container {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: fit-content;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .dashboard {
+        position: relative;
+        margin: 20px auto;
+        width: 90%;
+    }
+
+    .dashboard > h5 {
+        font-size: 6vw;
+    }
+
+    .dashboard > select,
+    .dashboard > input,
+    .dashboard > button {
+        font-size: 3.5vw;
+    }
+
+    .view {
+        justify-content: center;
+        padding: 0;
+    }
+
+    .box > img {
+        width: 43vw;
+    }
+
+    .box > span {
+        width: 43vw;
+        height: 8vw;
+        border-radius: 8px;
+        font-size: 3.2vw;
+    }
+}
+
+@media screen and (max-width: 420px) {
+    .box > img {
+        width: 86vw;
+    }
+
+    .box > span {
+        width: 86vw;
+        height: 10vw;
+        border-radius: 8px;
+        font-size: 4vw;
+    }
+}

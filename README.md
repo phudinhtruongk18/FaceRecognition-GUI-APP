@@ -2,15 +2,15 @@
 #Original by [JoeVenner](mailto:ylafrimi@gmail.com)
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://www.youtube.com/channel/UCKvgGs-ALhvOq9u95PHXHNw)
 <br>Forked From [FaceRecognition-GUI-APP](https://github.com/joeVenner/FaceRecognition-GUI-APP)
-<br>Thank JoeVenner for allow me to develop this awesome project <br>
+<br>Thank JoeVenner for allowing me to develop this awesome project <br>
 
 # Simple Face Attendance Recorder System    
-Instructor by : [MSIT Vũ Đình Long]()<br>
-Main develop by : [PhuDinhTruong](mailto:phudinhtruongk18@gmail.com)<br>
-Specila thank to for great support : [Pham Van Luong]() with [Sang Nguyen CN18A - GTS]()<br>
+Instructor: [MSIT Vũ Đình Long]()<br>
+Main develop and design: [Phu Dinh Truong](mailto:phudinhtruongk18@gmail.com)<br>
+Special thank to for great support: [Pham Van Luong](https://github.com/Watson-BCA) with [Sang Nguyen](mailto:sanghh111@gmail.com)<br>
+Web Front-End Designer: [Pham Thanh Long]()<br>
 
-
-# Simple Face Attendance Recorder System   
+# Simple Face Attendance Recorder System
 
   - Add information and collect face data of the Employee(Not yet)
   - Update information and face data of the Employee(Not yet)
@@ -18,12 +18,17 @@ Specila thank to for great support : [Pham Van Luong]() with [Sang Nguyen CN18A 
   - Retrain all Face Classifier 
   - Select the Employee and time for Attendance Session(Not yet)
   - Load Saved Attendance Session (Not yet)
+  - Start Attendance Session 
   - Detect the employee by face in realtime
   - Record the employee 
   - Update recorders in Database(Not yet)
-  - Backup attendance (Not yet)
+  - Backup attendance<b>(on testing)</b>
   - Collect and save Recorders after every session in Excel format (Not yet)
-  
+
+# Support Web Version  
+  - Select the Employee and time for Attendance Session(Not yet)
+  - Load Saved Attendance Session (only UI)
+  - Start Attendance Session Remote (Not yet)
 # Installation
 
 1 : Install the requirements .
