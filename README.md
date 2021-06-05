@@ -1,5 +1,4 @@
-
-#Original by [JoeVenner](mailto:ylafrimi@gmail.com)
+# Original by [JoeVenner](mailto:ylafrimi@gmail.com)
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://www.youtube.com/channel/UCKvgGs-ALhvOq9u95PHXHNw)
 <br>Forked From [FaceRecognition-GUI-APP](https://github.com/joeVenner/FaceRecognition-GUI-APP)
 <br>Thank JoeVenner for allowing me to develop this awesome project <br>

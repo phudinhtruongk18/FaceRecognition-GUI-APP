@@ -225,7 +225,7 @@ class DetectedUser:
 
     def on_start_hover(self, _, user_id_temp, button_temp, label_temp):
         button_temp.configure(bg="pink")
-        print(self.font)
+        print(user_id_temp)
         label_temp.configure(text="SHOW DETAIL INFORMATION\nabout home and life")
 
     def on_end_hover(self, _, user_id_temp, button_temp, label_temp):

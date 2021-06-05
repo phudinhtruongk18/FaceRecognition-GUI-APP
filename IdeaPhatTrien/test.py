@@ -66,40 +66,47 @@
 # if 32 in listt:
 #     print(listt.index(32))
 
-from tkinter import *
-import tkinter
+# from tkinter import *
+# import tkinter
+#
+# top = tkinter.Tk()
+#
+# B1 = tkinter.Button(top, text ="circle", relief=RAISED, cursor="tcross")
+#
+# def on_start_hover(event=None):
+#     B1.configure(bg="pink")
+#
+# def on_end_hover(event=None):
+#     B1.configure(bg="black")
+#
+# B2 = tkinter.Button(top, text ="plus", relief=RAISED, cursor="trek")
+# B3 = tkinter.Button(top, text ="mouse", relief=RAISED, cursor="watch")
+# B4 = tkinter.Button(top, text ="pirate", relief=RAISED, cursor="arrow")
+# B5 = tkinter.Button(top, text ="plus", relief=RAISED, cursor="shuttle")
+# B6 = tkinter.Button(top, text ="shuttle", relief=RAISED, cursor="sizing")
+# B7 = tkinter.Button(top, text ="sizing", relief=RAISED, cursor="spider")
+# B8 = tkinter.Button(top, text ="spider", relief=RAISED, cursor="spraycan")
+# B9 = tkinter.Button(top, text ="spraycan", relief=RAISED, cursor="star")
+# B10 = tkinter.Button(top, text="star", relief=RAISED, cursor="target")
+# B1.bind('<Enter>', on_start_hover)
+# B1.bind('<Leave>', on_end_hover)
+#
+# B1.pack()
+# B2.pack()
+# B3.pack()
+# B4.pack()
+# B5.pack()
+# B6.pack()
+# B7.pack()
+# B8.pack()
+# B9.pack()
+# B10.pack()
+# top.mainloop()
+#
 
-top = tkinter.Tk()
+import glob
+import os
 
-B1 = tkinter.Button(top, text ="circle", relief=RAISED, cursor="tcross")
-
-def on_start_hover(event=None):
-    B1.configure(bg="pink")
-
-def on_end_hover(event=None):
-    B1.configure(bg="black")
-
-B2 = tkinter.Button(top, text ="plus", relief=RAISED, cursor="trek")
-B3 = tkinter.Button(top, text ="mouse", relief=RAISED, cursor="watch")
-B4 = tkinter.Button(top, text ="pirate", relief=RAISED, cursor="arrow")
-B5 = tkinter.Button(top, text ="plus", relief=RAISED, cursor="shuttle")
-B6 = tkinter.Button(top, text ="shuttle", relief=RAISED, cursor="sizing")
-B7 = tkinter.Button(top, text ="sizing", relief=RAISED, cursor="spider")
-B8 = tkinter.Button(top, text ="spider", relief=RAISED, cursor="spraycan")
-B9 = tkinter.Button(top, text ="spraycan", relief=RAISED, cursor="star")
-B10 = tkinter.Button(top, text="star", relief=RAISED, cursor="target")
-B1.bind('<Enter>', on_start_hover)
-B1.bind('<Leave>', on_end_hover)
-
-B1.pack()
-B2.pack()
-B3.pack()
-B4.pack()
-B5.pack()
-B6.pack()
-B7.pack()
-B8.pack()
-B9.pack()
-B10.pack()
-top.mainloop()
-
+os.chdir("../Model/data/saved_sessions/")
+myFiles = glob.glob('*.txt')
+print(myFiles)
