@@ -12,11 +12,9 @@ class SelectSession:
 
         self.master.title("Select Session")
         w, h = int(self.master.winfo_screenwidth() * 5 / 6) + 50, int(self.master.winfo_screenheight() * 5 / 6)
-
         hCanvas = h - 27
         self.master.geometry("{0}x{1}+0+0".format(w, hCanvas))
 
-        style = ttk.Style()
         self.font = ('Helvetica', 23, "bold")
 
         self.ROOT_FRAME = jra.Frame(self.master, height=hCanvas)
@@ -27,44 +25,61 @@ class SelectSession:
         self.canvas_the_packer = jra.Canvas(self.right_frame, bg="#0CEDCB")
         self.canvas_the_packer.grid(row=1, column=0)
 
-        self.time_left_label = jra.Label(self.canvas_the_packer, bg="#0CEDCB", text="Select Saved Session   ",
-                                         font=('Helvetica', 20, "bold"), width=22)
-        self.time_left_label.grid(row=0, column=0, ipady=10)
+        self.infor_label = jra.Label(self.canvas_the_packer, bg="#0CEDCB", text="Your Saved Data",
+                                     font=('Helvetica', 20, "bold"), width=22)
+        self.infor_label.grid(row=0, column=0, ipady=10)
 
         self.label_option = ttk.Label(self.canvas_the_packer, style="W.TButton", width=19)
         self.label_option.grid(row=1, column=0)
-        self.selected_session = jra.StringVar(self.master, value="Select Your Session")
 
-        self.saved_sesions = self.get_saved_sesion()
-        self.session_option = jra.OptionMenu(self.label_option, self.selected_session, *self.saved_sesions)
-        self.session_option.configure(font=self.font, width=18, anchor=jra.CENTER, bd=5)
-        self.menu = self.master.nametowidget(self.session_option.menuname)
-        self.menu.config(font=self.font)
-        self.session_option.grid(row=0, column=0)
+        self.string_selected_session = jra.StringVar(self.master, value="Select Your Session")
+        self.list_saved_sesions = self.get_saved_sesion()
+        self.session_option_menu = jra.OptionMenu(self.label_option, self.string_selected_session, *self.list_saved_sesions)
+        self.session_option_menu.configure(font=self.font, width=18, anchor=jra.CENTER, bd=5)
+        self.menu_option = self.master.nametowidget(self.session_option_menu.menuname)
+        self.menu_option.config(font=self.font)
+        self.session_option_menu.grid(row=0, column=0)
+        # change the picked employee when change the session
+        self.string_selected_session.trace("w", self.show_this_session)
 
         jra.Label(self.canvas_the_packer, bg="#0CEDCB").grid(row=2, column=0)
-        self.pick_session = jra.Button(self.canvas_the_packer, width=15, font=self.font, text="Select This Session")
-        self.pick_session.configure(bg="#EDE8BE", font=self.font, command=self.select_this_session, bd=5)
-        self.pick_session.grid(row=3, column=0)
+        self.pick_session_btn = jra.Button(self.canvas_the_packer, width=15, font=self.font, text="Select This!")
+        self.pick_session_btn.configure(bg="#EDE8BE", font=self.font, command=self.select_this_session, bd=5)
+        self.pick_session_btn.grid(row=3, column=0)
         jra.Label(self.canvas_the_packer, bg="#0CEDCB").grid(row=4, column=0, ipady=10)
 
-        jra.Label(self.right_frame).grid(row=3, column=0)
-        self.save_session = jra.Button(self.right_frame, text="Save Session", width=15, height=1)
-        self.save_session.configure(bg="#DAEBEB", font=self.font, command=self.save_this_session)
-        self.save_session.grid(row=4, column=0)
+        self.time_label = jra.Label(self.right_frame)
+        self.time_label.grid(row=3, column=0)
+        jra.Label(self.time_label).grid(row=0, column=0, ipady=1)
+        self.guide_time_label = jra.Label(self.time_label, text="Duration: ",
+                                font=('Helvetica', 18, "bold"), width=8)
+        self.guide_time_label.grid(row=1, column=0, ipady=10)
+        self.time_entry = jra.Entry(self.time_label, font=self.font,bg="#C2F5F0", justify='center', width=4)
+        self.time_entry.grid(row=1, column=1, ipady=5)
+        self.guide_time_label2 = jra.Label(self.time_label, text="min",
+                                font=('Helvetica', 18, "bold"), width=4)
+        self.guide_time_label2.grid(row=1, column=3, ipady=5)
+        jra.Label(self.time_label).grid(row=2, column=0, ipady=1)
+
+        self.save_session_btn = jra.Button(self.right_frame, text="Save", width=15, height=1)
+        self.save_session_btn.configure(bg="#DAEBEB", font=self.font, command=self.save_this_session)
+        self.save_session_btn.grid(row=4, column=0)
         jra.Label(self.right_frame).grid(row=5, column=0)
-        self.deselected = jra.Button(self.right_frame, text="Deselected", width=15, height=1)
-        self.deselected.configure(bg="#DAEBEB", font=self.font, command=self.deselected_all)
-        self.deselected.grid(row=6, column=0)
+        self.deselected_btn = jra.Button(self.right_frame, text="Deselected", width=15, height=1)
+        self.deselected_btn.configure(bg="#DAEBEB", font=self.font, command=self.deselected_all)
+        self.deselected_btn.grid(row=6, column=0)
         jra.Label(self.right_frame).grid(row=7, column=0)
+        self.delete_saved_one = jra.Button(self.right_frame, text="Delete", width=15, height=1)
+        self.delete_saved_one.configure(bg="#DAEBEB", font=self.font, command=self.delete_current_one)
+        self.delete_saved_one.grid(row=8, column=0)
+        jra.Label(self.right_frame).grid(row=9, column=0)
         self.exit_button = jra.Button(self.right_frame, text="Cancel", width=15, height=1)
         self.exit_button.configure(bg="#DAEBEB", font=self.font, command=self.cancel_select)
-        self.exit_button.grid(row=8, column=0)
+        self.exit_button.grid(row=10, column=0)
 
         self.left_frame = jra.Frame(self.ROOT_FRAME)
         self.left_frame.grid(row=0, column=2)
         self.canvas = jra.Canvas(self.left_frame, width=int(w * 7.5 / 10), height=hCanvas, bg="#faf3e0")
-        # self.canvas = jra.Canvas(self.left_frame)
         self.canvas.pack(side=jra.LEFT, fill=jra.BOTH, expand=1)
         self.scroll_bar = ttk.Scrollbar(self.left_frame, orient=jra.VERTICAL, command=self.canvas.yview)
         self.scroll_bar.pack(side=jra.RIGHT, fill=jra.Y)
@@ -83,12 +98,31 @@ class SelectSession:
         self.scroll_bar.pack(side=jra.RIGHT, fill=jra.Y)
         self.master.withdraw()
         self.button_size = 250
+
+        # work with sql later on
         list_users = ["phu", "BanHao", "Buttercup", "BeEm", "BeEm", "BeNhi", "ahTan", "beHung", "beHungZthung", "phu",
                       "phu3", "ahTan2", "HDVlog2"]
         self.add_all_user(list_all_user=list_users)
 
+    def delete_current_one(self):
+        # work with sql later on
+        print("xoa ne chac chua")
+        session_name = self.string_selected_session.get()
+
+        filename = "Model/data/saved_sessions/" + session_name
+        if os.path.exists(filename):
+            os.remove(filename)
+            messagebox.showinfo("Complete", "Delete complete!")
+        else:
+            messagebox.showinfo("Error", "This name session is not exists! Try again!")
+        self.reset_saved_sesions()
+
     def select_this_session(self):
-        file_name = self.selected_session.get()
+        # return self.picked employee frame to begin the attendance
+        print("Done with the select page")
+
+    def show_this_session(self, *args):
+        file_name = self.string_selected_session.get()
         if file_name.__eq__("Select Your Session"):
             return
         self.deselected_all()
@@ -102,7 +136,6 @@ class SelectSession:
         for temp_employee in self.picked_user:
             for temp_btn in self.list_buttons:
                 if temp_btn.cget("text") == temp_employee:
-                    print(temp_btn.cget("text"))
                     temp_btn.configure(bg="pink")
                     break
 
@@ -123,6 +156,8 @@ class SelectSession:
             f = open(filename, "w")
             f.write(str_names)
             f.close()
+            self.reset_saved_sesions()
+            # self.show_this_session()
             backup_box_temp.destroy()
         else:
             messagebox.showinfo("Error", "This name session is exists! Try again!")
@@ -137,19 +172,18 @@ class SelectSession:
         h = 160
         x, y = ws / 2 - w / 2, hs / 2 - h - 50
         backup_box.geometry('%dx%d+%d+%d' % (w, h, x, y))
-        backup_id_entry = jra.Entry(backup_box, bg="#faf3e0", font=self.font, justify='center', width=23)
-        backup_id_entry.grid(row=0, column=0, sticky="N", ipady=20)
+        name_ss_entry = jra.Entry(backup_box, bg="#faf3e0", font=self.font, justify='center', width=23)
+        name_ss_entry.grid(row=0, column=0, sticky="N", ipady=20)
         packet_label = jra.Label(backup_box, bg="#faf3e0")
         confirm_button = jra.Button(packet_label, text="Save", bg="#eabf9f", width=10, height=1, font=self.font,
-                                    command=lambda: self.let_save_session(backup_id_entry.get(), backup_box))
+                                    command=lambda: self.let_save_session(name_ss_entry.get(), backup_box))
         confirm_button.grid(row=0, column=0, sticky="SW")
         cancel_button = jra.Button(packet_label, text="Cancel", bg="#eabf9f", width=10, height=1, font=self.font,
                                    command=backup_box.destroy)
         cancel_button.grid(row=0, column=1, sticky="SE")
         packet_label.grid(row=1, column=0, sticky="S")
-        backup_id_entry.focus_set()
-        backup_id_entry.bind('<Return>', lambda event: self.let_save_session(backup_id_entry.get(), backup_box))
-        self.saved_sesions = self.get_saved_sesion()
+        name_ss_entry.focus_set()
+        name_ss_entry.bind('<Return>', lambda event: self.let_save_session(name_ss_entry.get(), backup_box))
 
     def add_all_user(self, list_all_user):
         # get employee photo
@@ -205,17 +239,10 @@ class SelectSession:
             print("I don't know man! what the fuk?")
         print(self.picked_user)
 
-    # def update_detected_text(self, num_of_list, num_of_left):
-    #     # num_of_left += 1
-    #     self.num_detected.configure(text=num_of_list - num_of_left)
-    #     self.employee_left.configure(text=num_of_left)
-
     def cancel_select(self):
-        # # stop detecting in Detector
-        # self.menuUI.stop_detect()
         # hide this window
         self.master.withdraw()
-        # # reset for new session
+        # reset for new session
         self.reset_data()
         # show up menuUI
         self.menuUI.controller.deiconify()
@@ -234,10 +261,9 @@ class SelectSession:
         self.row = 0
         self.column = 0
 
-    def show(self, timer):
+    def show(self):
         # show this window
         self.master.deiconify()
-        # start counting down
 
     def on_configure(self, _):
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
@@ -258,3 +284,11 @@ class SelectSession:
         for root, dirs, files in os.walk("Model/data/saved_sessions/"):
             saved_sesion = files
         return saved_sesion
+
+    def reset_saved_sesions(self):
+        self.list_saved_sesions = self.get_saved_sesion()
+        self.menu_option.delete(0, "end")
+        for string in self.list_saved_sesions:
+            self.menu_option.add_command(label=string,
+                                         command=lambda value=string: self.string_selected_session.set(value))
+

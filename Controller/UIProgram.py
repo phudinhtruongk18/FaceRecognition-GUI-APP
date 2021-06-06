@@ -70,7 +70,7 @@ class StartPage(tk.Frame):
 
         new_window2 = tk.Toplevel(self)
         self.SelectWindow = SelectSession(new_window2, self)
-        self.SelectWindow.show(5)
+        self.SelectWindow.show()
 
         self.controller = controller
         self.dec = None
