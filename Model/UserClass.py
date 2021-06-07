@@ -1,8 +1,8 @@
 class ListUserDetector(list):
-    def __init__(self, names):
+    def __init__(self, all_employee_data):
         super().__init__()
-        for name in names:
-            self.append(UserDetector(name))
+        for employee in all_employee_data:
+            self.append(UserDetector(employee))
 
     def show_list_users(self):
         for tempUser in self:
@@ -15,14 +15,20 @@ class ListUserDetector(list):
                 return index
         return None
 
-    def add_backup_user(self, id_to_add):
-        self.append((UserDetector(id_to_add)))
+    def add_backup_user(self, employee):
+        self.append((UserDetector(employee)))
 
 
 class UserDetector:
-    def __init__(self, name):
+    def __init__(self, *args):
+        if args.__len__() < 5:
+            print("Wrong Employee Data!")
         self.counter = 0
-        self.name = name
+        self.ID = args[0]
+        self.name = args[1]
+        self.sex = args[2]
+        self.age = args[3]
+        self.unit = args[4]
 
     def detect_user(self):
         self.counter += 8

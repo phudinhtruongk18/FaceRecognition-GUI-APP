@@ -70,7 +70,6 @@ class StartPage(tk.Frame):
 
         new_window2 = tk.Toplevel(self)
         self.SelectWindow = SelectSession(new_window2, self)
-        self.SelectWindow.show()
 
         self.controller = controller
         self.dec = None
@@ -102,7 +101,7 @@ class StartPage(tk.Frame):
         button6.grid(row=5, column=0, ipady=4, ipadx=2)
 
     def select_session(self):
-        print("select_session")
+        self.SelectWindow.show()
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Are you sure?"):
@@ -134,9 +133,13 @@ class StartPage(tk.Frame):
             messagebox.showinfo("INSTRUCTIONS", "List users is empty. Let add someone first!")
 
     def backup_detected_user_with_index_to_detector(self, index_to_backup):
+        # work with sql here index_to_backup to infor of user
+        with
         self.dec.backup_detected_user_with_index(index_to_backup)
 
     def backup_detected_user_with_id_to_detector(self, id_to_backup):
+        # work with sql here index_to_backup to infor of user
+        with
         self.dec.backup_detected_user_with_id(id_to_backup)
 
     def detected_user_from_detector(self, id_to_check):

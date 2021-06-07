@@ -100,8 +100,9 @@ class SelectSession:
         self.button_size = 250
 
         # work with sql later on
-        list_users = ["phu", "BanHao", "Buttercup", "BeEm", "BeEm", "BeNhi", "ahTan", "beHung", "beHungZthung", "phu",
-                      "phu3", "ahTan2", "HDVlog2"]
+        list_users = ["ARAM001", "ARAM002", "ARAM003", "ARAM004", "ARAM005", "ARAM006", "ARAM007", "ARAM008", "ARAM009",
+                      "ARAM010", "ARAM011", "ARAM012", "ARAM013", "ARAM014", "ARAM015", "ARAM016", "ARAM017", "ARAM018",
+                      "ARAM019", "ARAM020", "ARAM021", "ARAM022", "ARAM023", "ARAM024", "ARAM025"]
         self.add_all_user(list_all_user=list_users)
 
     def delete_current_one(self):
@@ -193,7 +194,7 @@ class SelectSession:
             found = False
             user_pic = Image.open("View/Stock/user-circle.png")
             while not found:
-                if num > 20:
+                if num > 100:
                     print("Wrong user picture!")
                     break
                 try:
