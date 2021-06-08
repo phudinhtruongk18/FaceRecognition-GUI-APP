@@ -1,6 +1,7 @@
 import sqlite3
+from datetime import datetime
 
-from Model.UserClass import UserDetector
+from Model.UserClass import UserDetector, Session, RecordDetail
 
 
 class Database:
@@ -56,16 +57,179 @@ class Database:
         SELECT * FROM EMPLOYEE
         ORDER BY UNIT;
         """)
-        my_data = [i for i in result]
         # i[0] is NAME
-        return my_data
+        return result
 
     def insert_employee(self, employee):
-        result = self.query(f'INSERT INTO EMPLOYEE VALUES ({employee.ID},{employee.name},{employee.sex},{employee.age},{employee.unit});')
-        print(result)
+        try:
+            self.execute('INSERT INTO EMPLOYEE (ID, NAME, SEX, AGE, UNIT) VALUES (?, ?, ?, ?, ?)',
+                         (employee.ID, employee.name, employee.sex, employee.age, employee.unit))
+            # check = self.query('SELECT * FROM EMPLOYEE WHERE ID =?', (employee.ID,))
+            # if check == employ -> return true
+            return True
+        except sqlite3.IntegrityError:
+            print("IntegrityError")
+        except Exception as e:
+            print(e)
+        return False
 
+    def insert_session(self, session):
+        try:
+            self.execute('INSERT INTO SESSION (ID, NAME, DURATION) VALUES (?, ?, ?)',
+                         (session.ID, session.name, session.duration))
+            # check = self.query('SELECT * FROM EMPLOYEE WHERE ID =?', (employee.ID,))
+            # if check == employ -> return true
+            return True
+        except sqlite3.IntegrityError:
+            print("IntegrityError")
+        except Exception as e:
+            print(e)
+        return False
+
+    def get_all_sesion(self):
+        sql = "SELECT * FROM SESSION"
+        return self.query(sql)
+
+    def get_all_employee_id_by_session_ID(self, ID_SESSION):
+        sql = F"SELECT ID_EMPLOYEE FROM SAVED_SESSION WHERE ID_SESSION = ?;"
+        result = self.query(sql, (ID_SESSION,))
+        my_data = [i[0] for i in result]
+        # i[0] is ID of the employee
+        return my_data
+
+    def insert_and_get_id_recorder(self, ID_SESSION):
+        try:
+            now = datetime.now()
+            time = now.strftime('%Y-%m-%d')
+            ID_RECORDER = now.strftime('%Y-%m-%d %H:%M:%S')
+            self.execute('INSERT INTO RECORDER (ID,ID_SESSION,RECORD_DATE) VALUES (?, ?, ?)',
+                         (ID_RECORDER, ID_SESSION, time))
+            # check = self.query('SELECT * FROM EMPLOYEE WHERE ID =?', (employee.ID,))
+            # if check == employ -> return true
+            return ID_RECORDER
+        except sqlite3.IntegrityError:
+            print("IntegrityError")
+        except Exception as e:
+            print(e)
+        return None
+
+    def insert_new_record(self, IS_BACKUP, ID_EMPLOYEE, ID_RECORDER):
+        try:
+            ARRIVED_TIME = datetime.now().strftime('%H:%M:%S')
+
+            self.execute("INSERT INTO DETAIL_RECORD (ARRIVED_TIME,IS_BACKUP,ID_EMPLOYEE,ID_RECORDER) VALUES (?,?,?,?)",
+                         (ARRIVED_TIME, int(IS_BACKUP), ID_EMPLOYEE, ID_RECORDER))
+            return True
+        except sqlite3.IntegrityError:
+            print("IntegrityError")
+        except Exception as e:
+            print(e)
+        return False
+
+    def get_all_recorder(self):
+        sql = "SELECT ID FROM RECORDER;"
+        result = self.query(sql)
+        my_data = [i[0] for i in result]
+        # i[0] is ID of the employee
+        return my_data
+
+    def get_recorder_by_time(self,begin_time,end_time):
+        sql = "SELECT ID FROM RECORDER WHERE RECORD_DATE BETWEEN ? AND ?;"
+        result = self.query(sql,(begin_time,end_time))
+        my_data = [i[0] for i in result]
+        # i[0] is ID of the employee
+        return my_data
+
+    def get_all_detail_record_by_recorder_id(self, ID_RECORDER):
+        sql = "SELECT * FROM DETAIL_RECORD WHERE ID_RECORDER =?;"
+        result = self.query(sql,(ID_RECORDER,))
+        # i[0] is ID of the employee
+        return result
+
+    def delete_employee_by_id(self, ID_EMPLOYEE):
+        try:
+            sql = "DELETE FROM EMPLOYEE WHERE ID=?;"
+            self.execute(sql,(ID_EMPLOYEE,))
+            # i[0] is ID of the employee
+            return True
+        except sqlite3.Error as e:
+            print(e)
+        return False
+
+    def get_employee_infor_by_id(self,ID_EMPLOYEE):
+        sql = "SELECT * FROM EMPLOYEE WHERE ID = ?;"
+        result = self.query(sql,(ID_EMPLOYEE,))
+
+        return result
+
+    def update_employee_infor_by_id(self,ID_EMPLOYEE, **kwargs):
+        print(self.get_employee_infor_by_id(ID_EMPLOYEE))
+        # attribute = kwargs.pop('ID', "id CUA NHAN VIEN MOI LAM RA")
+        # print(attribute)
+
+        # try:
+        #     sql = "UPDATE TEN_BANG SET cot1 = gtri1, cot2 = gtri2...., cotN = gtriN WHERE [DIEU_KIEN];"
+        #     result = self.query(sql,(ID_EMPLOYEE,))
+        #     # i[0] is ID of the employee
+        #     return True
+        # except sqlite3.Error as e:
+        #     print(e)
+        # return False
 
 with Database('Model/data/database/database.db') as db:
     # print(db.get_all_user_name())
+
     # print(db.get_load_infor())
-    db.insert_employee(UserDetector('TEST001', 'PhuDinhTruong', 'MALE', 28, 'FREELANCER'))
+
+    # if db.insert_employee(UserDetector('TEST002', 'Phu Dinh', 'MALE', 28, 'FREELANCER')):
+    #     print("Done")
+    # else:
+    #     print("Can't add this employee! Try Again")
+
+        # session_list = []
+        # all_session = db.get_all_sesion()
+        # for temp_sesion in all_session:
+        #     session_list.append(Session(temp_sesion[0],temp_sesion[1],temp_sesion[2]))
+        # obj = session_list[0]
+        # print(obj.ID)
+
+    # print(db.get_all_employee_id_by_session_ID("SESSION003"))
+
+    # if db.insert_session(Session("TEST002","TEST NEK BN ƠI",69)):
+    #     print("Done")
+    # else:
+    #     print("Can't add this employee! Try Again")
+
+    # # RECORDER
+    # ID_SESSION = "TEST_SESSION_001"
+    # ID_RECORDER = db.insert_and_get_id_recorder(ID_SESSION)
+    # if result is not None:
+    #     print(ID_RECORDER)
+    #     print("Success")
+    # else:
+    #     print("Some thing Wrong when create new recorder")
+
+    # ADD NEW RECORD
+    # IS_BACKUP = True
+    # ID_EMPLOYEE = "ARAM001"
+    # ID_RECORDER = "THANKLONG001"
+    # if db.insert_new_record(IS_BACKUP, ID_EMPLOYEE, ID_RECORDER):
+    #     print(ID_RECORDER)
+    #     print("Success")
+    # else:
+    #     print("Some thing Wrong when create new recorder")
+
+    # print(db.get_all_recorder())
+    # my_recorder = db.get_recorder_by_time(begin_time="2019-02-20",end_time="2022-02-28")
+    # for temp2 in db.get_all_detail_record_by_recorder_id(my_recorder[0]):
+    #     thanklong = RecordDetail(temp2[0], temp2[1], temp2[2], temp2[3], temp2[4])
+    #     print(thanklong.id_recorder)
+
+    # delete
+    # db.insert_employee(UserDetector('TEST002', 'Phu Dinh', 'MALE', 28, 'FREELANCER'))
+    # if db.delete_employee_by_id('TEST002'):
+    #     print("Succes")
+    # else:
+    #     print("Something went wrong! Try again")
+
+    db.update_employee_infor_by_id("ARAM017")

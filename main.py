@@ -6,5 +6,5 @@
 #     app = ProgramUI.MainUI()
 #     app.iconphoto(False, tk.PhotoImage(file='View/Stock/icon.ico'))
 #     app.mainloop()
-
+#
 import Model.data_manager

@@ -66,7 +66,7 @@ def lbp_calculated_pixel(img, x, y):
     return val
 
 
-path = 'phu.png'
+path = '../HinhAnh/phu.png'
 img_bgr = cv2.imread(path, 1)
 
 height, width, _ = img_bgr.shape

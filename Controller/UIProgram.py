@@ -134,12 +134,12 @@ class StartPage(tk.Frame):
 
     def backup_detected_user_with_index_to_detector(self, index_to_backup):
         # work with sql here index_to_backup to infor of user
-        with
+        # with
         self.dec.backup_detected_user_with_index(index_to_backup)
 
     def backup_detected_user_with_id_to_detector(self, id_to_backup):
         # work with sql here index_to_backup to infor of user
-        with
+        # with
         self.dec.backup_detected_user_with_id(id_to_backup)
 
     def detected_user_from_detector(self, id_to_check):

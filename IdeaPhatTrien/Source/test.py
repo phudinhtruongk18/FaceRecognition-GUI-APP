@@ -172,3 +172,13 @@
 #      print(temp)
 #
 #
+def testFunc( **kwargs ):
+    attribute = kwargs.pop('ID', "id CUA NHAN VIEN MOI LAM RA")
+    print(attribute)
+
+
+testFunc( ID='new_value1', option3='new_value3' )
+# {'option2': 'default_value2', 'option3': 'new_value3', 'option1': 'new_value1'}
+
+testFunc( option2='new_value2' )
+# {'option1': 'default_value1', 'option3': 'default_value3', 'option2': 'new_value2'}

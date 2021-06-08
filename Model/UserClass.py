@@ -32,3 +32,20 @@ class UserDetector:
 
     def detect_user(self):
         self.counter += 8
+
+
+class Session:
+    def __init__(self, *args):
+        print(args)
+        self.ID = args[0]
+        self.name = args[1]
+        self.duration = args[2]
+
+
+class RecordDetail:
+    def __init__(self, *args):
+        self.ID = args[0]
+        self.arrived_time = args[1]
+        self.is_backup = args[2]
+        self.id_employee = args[3]
+        self.id_recorder = args[4]
