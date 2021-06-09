@@ -2,7 +2,7 @@ class ListUserDetector(list):
     def __init__(self, all_employee_data):
         super().__init__()
         for employee in all_employee_data:
-            self.append(UserDetector(employee))
+            self.append(UserDetector(*employee))
 
     def show_list_users(self):
         for tempUser in self:
@@ -10,7 +10,7 @@ class ListUserDetector(list):
 
     def find_index_by_id(self,id_to_check):
         for index,temp_user in enumerate(self):
-            if temp_user.name == id_to_check:
+            if temp_user.ID == id_to_check:
                 print(temp_user,id_to_check,"found")
                 return index
         return None
@@ -20,6 +20,7 @@ class ListUserDetector(list):
 
 
 class UserDetector:
+
     def __init__(self, *args):
         if args.__len__() < 5:
             print("Wrong Employee Data!")

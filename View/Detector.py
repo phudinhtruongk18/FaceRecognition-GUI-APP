@@ -106,7 +106,7 @@ class Detector(Thread):
 
     def read_single_classifier(self, list_index):
         for index_to_read in list_index:
-            path_t = "Model/data/classifiers/" + self.list_users[index_to_read].name + "_classifier.xml"
+            path_t = "Model/data/classifiers/" + self.list_users[index_to_read].ID + "_classifier.xml"
             self.recognizer[index_to_read].read(path_t)
             self.menu_UI.progress_bar['value'] += (self.progress + 1) / len(self.list_users) * 100
 

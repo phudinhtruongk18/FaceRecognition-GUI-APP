@@ -1,4 +1,5 @@
 from Controller.DetectedUser import DetectedUser
+from Model.UserClass import UserDetector
 from View.Detector import Detector
 from Model.train_all_classifiers import train_all_classifers
 from Model.create_one_new_classifier import train_one_classifer
@@ -7,20 +8,14 @@ import tkinter as tk
 from tkinter import font as tkfont, ttk
 from tkinter import messagebox, PhotoImage
 from Controller.SelectSession import SelectSession
-
-names = []
+from Model.data_manager import DataManager
 
 
 class MainUI(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-        global names
-        with open("Model/nameslist.txt", "r") as f:
-            x = f.read()
-            z = x.rstrip().split(" ")
-            for i in z:
-                names.append(i)
+
         self.title("Face Attendance Recorder System")
         self.resizable(False, False)
         ws = self.winfo_screenwidth()
@@ -28,7 +23,7 @@ class MainUI(tk.Tk):
         x, y = ws / 2 - 510 / 2, hs / 2 - 350
         self.geometry('%dx%d+%d+%d' % (510, 350, x, y))
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
-        self.active_name = None
+        self.active_employee = None
 
         container = tk.Frame(self)
         container.grid(sticky="nsew")
@@ -49,14 +44,14 @@ class MainUI(tk.Tk):
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Are you sure?"):
-            global names
-            str_names = ""
-            for name in names:
-                if name != "None":
-                    str_names = str_names + name + " "
-
-            f = open("Model/nameslist.txt", "w")
-            f.write(str_names)
+            # global names
+            # str_names = ""
+            # for name in names:
+            #     if name != "None":
+            #         str_names = str_names + name + " "
+            #
+            # f = open("Model/nameslist.txt", "w")
+            # f.write(str_names)
             self.destroy()
 
 
@@ -84,17 +79,22 @@ class StartPage(tk.Frame):
                          font=tkfont.Font(family='Helvetica', size=16, weight="bold"), fg="#263942")
         label.grid(row=0, sticky="ew")
 
-        button1 = tk.Button(self, text="   Add a user  ", fg="#ffffff", bg="#263942",
+        label1 = tk.Label(self)
+        label1.grid(row=1, column=0, ipady=3, ipadx=2)
+
+        button1 = tk.Button(label1, text="   Add a user  ", fg="#ffffff", bg="#263942",
                             command=lambda: self.controller.show_frame("PageOne"))
-        # button2 = tk.Button(self, text="   Check a User  ", fg="#ffffff", bg="#263942",
-        #                     command=lambda: self.controller.show_frame("PageTwo"))
+
+        button2 = tk.Button(label1, text="   Change Infor  ", fg="#ffffff", bg="#263942",
+                            command=lambda: self.controller.show_frame("PageTwo"))
         button3 = tk.Button(self, text="  Retrain dataset ", fg="#ffffff", bg="#263942", command=self.train_data)
         button4 = tk.Button(self, text="   Select Session  ", fg="#ffffff", bg="#263942", command=self.select_session)
         button5 = tk.Button(self, text="   Start Session  ", fg="#ffffff", bg="#263942", command=self.openwebcam)
         button6 = tk.Button(self, text="    Quit    ", fg="#263942", bg="#ffffff", command=self.on_closing)
 
         button1.grid(row=1, column=0, ipady=3, ipadx=2)
-        # button2.grid(row=2, column=0, ipady=3, ipadx=2)
+        button2.grid(row=1, column=1, ipady=3, ipadx=2)
+
         button3.grid(row=2, column=0, ipady=4, ipadx=2)
         button4.grid(row=3, column=0, ipady=4, ipadx=2)
         button5.grid(row=4, column=0, ipady=4, ipadx=2)
@@ -105,29 +105,31 @@ class StartPage(tk.Frame):
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Are you sure?"):
-            global names
-            str_names = ""
-            for i in names:
-                if i != "None":
-                    str_names = str_names + i + " "
-
-            f = open("Model/nameslist.txt", "w")
-            f.write(str_names)
+            # global names
+            # str_names = ""
+            # for i in names:
+            #     if i != "None":
+            #         str_names = str_names + i + " "
+            #
+            # f = open("Model/nameslist.txt", "w")
+            # f.write(str_names)
             self.controller.destroy()
 
     def train_data(self):
-        global names
         messagebox.showinfo("INSTRUCTIONS", "Wait a few minute.... we are training!")
         self.controller.list_users = train_all_classifers()
-        names = self.controller.list_users
 
     def openwebcam(self):
-        global names
-        if names is not None:
+        with DataManager('Model/data/database/database.db') as db:
+            ALL_ID = db.query("SELECT * FROM EMPLOYEE")
+            print(ALL_ID)
+
+        # make some process here after load page
+        if ALL_ID is not None:
             print("Detecting....")
             self.progress_bar['value'] = 0
-            self.progress_bar.grid(row=4, column=1, sticky="nsew")
-            self.dec = Detector(names, self)
+            self.progress_bar.grid(row=5, column=1, sticky="nsew")
+            self.dec = Detector(ALL_ID, self)
             self.dec.start()
         else:
             messagebox.showinfo("INSTRUCTIONS", "List users is empty. Let add someone first!")
@@ -185,30 +187,63 @@ class PageOne(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        tk.Label(self, text="Enter the name", fg="#263942", font='Helvetica 12 bold').grid(row=0, column=0, pady=10,
-                                                                                           padx=5)
-        self.student_name = tk.Entry(self, borderwidth=3, bg="lightgrey", font='Helvetica 11')
-        self.student_name.grid(row=0, column=1, pady=10, padx=10)
+        tk.Label(self, text="ID", fg="#263942", font='Helvetica 12 bold').grid(row=0, column=0, pady=10, padx=5)
+        self.employee_ID = tk.Entry(self, borderwidth=3, bg="lightgrey", font='Helvetica 11')
+        self.employee_ID.grid(row=0, column=1, pady=10, padx=10)
+        tk.Label(self, text="NAME", fg="#263942", font='Helvetica 12 bold').grid(row=1, column=0, pady=10, padx=5)
+        self.employee_NAME = tk.Entry(self, borderwidth=3, bg="lightgrey", font='Helvetica 11')
+        self.employee_NAME.grid(row=1, column=1, pady=10, padx=10)
+        tk.Label(self, text="SEX", fg="#263942", font='Helvetica 12 bold').grid(row=2, column=0, pady=10, padx=5)
+        self.employee_SEX = tk.Entry(self, borderwidth=3, bg="lightgrey", font='Helvetica 11')
+        self.employee_SEX.grid(row=2, column=1, pady=10, padx=10)
+        tk.Label(self, text="AGE", fg="#263942", font='Helvetica 12 bold').grid(row=3, column=0, pady=10, padx=5)
+        self.employee_AGE = tk.Entry(self, borderwidth=3, bg="lightgrey", font='Helvetica 11')
+        self.employee_AGE.grid(row=3, column=1, pady=10, padx=10)
+        tk.Label(self, text="UNIT", fg="#263942", font='Helvetica 12 bold').grid(row=4, column=0, pady=10, padx=5)
+        self.employee_UNIT = tk.Entry(self, borderwidth=3, bg="lightgrey", font='Helvetica 11')
+        self.employee_UNIT.grid(row=4, column=1, pady=10, padx=10)
+
         self.button_cancel = tk.Button(self, text="Cancel", bg="#ffffff", fg="#263942",
                                        command=lambda: controller.show_frame("StartPage"))
         self.button_next = tk.Button(self, text="Next", fg="#ffffff", bg="#263942", command=self.start_training)
-        self.button_cancel.grid(row=1, column=0, pady=10, ipadx=5, ipady=4)
-        self.button_next.grid(row=1, column=1, pady=10, ipadx=5, ipady=4)
+        self.button_cancel.grid(row=6, column=0, pady=10, ipadx=5, ipady=4)
+        self.button_next.grid(row=6, column=1, pady=10, ipadx=5, ipady=4)
 
     def start_training(self):
-        global names
-        if self.student_name.get() == "None":
+        with DataManager('Model/data/database/database.db') as db:
+            ALL_ID = db.get_all_user_ID()
+        print(ALL_ID)
+        if self.employee_ID.get() == "None":
             messagebox.showerror("Error", "Name cannot be 'None'")
             return
-        elif self.student_name.get() in names:
+        elif self.employee_ID.get() in ALL_ID:
             messagebox.showerror("Error", "User already exists!")
             return
-        elif len(self.student_name.get()) == 0:
+        elif len(self.employee_ID.get()) == 0:
             messagebox.showerror("Error", "Name cannot be empty!")
             return
-        name = self.student_name.get()
-        names.append(name)
-        self.controller.active_name = name
+        try:
+            employ_ID = self.employee_ID.get()
+            employ_NAME = self.employee_NAME.get()
+            employ_AGE = int(self.employee_AGE.get())
+            if employ_AGE < 1:
+                messagebox.showinfo("Wrong Age", "You are too young for working! Grow up and try again!")
+                return
+            employ_SEX = self.employee_SEX.get()
+            employ_UNIT = self.employee_UNIT.get()
+        except TypeError as type_error:
+            messagebox.showinfo("Wrong format", str(type_error))
+            return
+        except Exception as e:
+            messagebox.showinfo("Exception error", str(e))
+            return
+        if "" in [employ_NAME, employ_AGE, employ_SEX, employ_UNIT]:
+            messagebox.showinfo("Not alow Null", "Type all there information!")
+            return
+
+        temp_employee = UserDetector(employ_ID, employ_NAME, employ_SEX, employ_AGE, employ_UNIT)
+
+        self.controller.active_employee = temp_employee
         # self.controller.frames["PageTwo"].refresh_names()
         self.controller.show_frame("PageThree")
 
@@ -219,25 +254,120 @@ class PageTwo(tk.Frame):
         tk.Frame.__init__(self, parent)
         global names
         self.controller = controller
-        tk.Label(self, text="Select user", fg="#263942", font='Helvetica 12 bold').grid(row=0, column=0, padx=10,
-                                                                                        pady=10)
-        self.button_cancel = tk.Button(self, text="Cancel", command=lambda: controller.show_frame("StartPage"),
-                                       bg="#ffffff", fg="#263942")
+        self.note_label = tk.Label(self, text="Update employee information", fg="#263942", font='Helvetica 12 bold')
+        self.note_label.grid(row=0, column=0)
         self.menu_var = tk.StringVar(self)
-        self.dropdown = tk.OptionMenu(self, self.menu_var, *names)
-        self.dropdown.config(bg="lightgrey")
-        self.dropdown["menu"].config(bg="lightgrey")
-        self.button_next = tk.Button(self, text="Next", command=self.next_foo, fg="#ffffff", bg="#263942")
-        self.dropdown.grid(row=0, column=1, ipadx=8, padx=10, pady=10)
-        self.button_cancel.grid(row=1, ipadx=5, ipady=4, column=0, pady=10)
-        self.button_next.grid(row=1, ipadx=5, ipady=4, column=1, pady=10)
 
-    def next_foo(self):
-        if self.menu_var.get() == "None":
-            messagebox.showerror("ERROR", "Name cannot be 'None'")
-            return
-        self.controller.active_name = self.menu_var.get()
-        self.controller.show_frame("StartPage")
+        self.employee_detail = tk.Label(self)
+
+        self.label_ID = tk.Label(self.employee_detail)
+        self.label_ID.grid(row=0, column=0)
+
+        tk.Label(self.label_ID, text="ID", fg="#263942", font='Helvetica 12 bold').grid(row=0, column=0)
+        self.employee_ID = tk.Entry(self.label_ID, borderwidth=2, bg="lightgrey", font='Helvetica 11')
+        self.employee_ID.grid(row=1, column=0)
+
+        self.employee_detail2 = tk.Label(self.employee_detail)
+
+        tk.Label(self.employee_detail2, text="NAME", fg="#263942", font='Helvetica 12 bold').grid(row=1, column=0,
+                                                                                                  pady=10, padx=5)
+        self.employee_NAME = tk.Entry(self.employee_detail2, borderwidth=3, bg="lightgrey", font='Helvetica 11')
+        self.employee_NAME.grid(row=1, column=1, pady=10, padx=10)
+        tk.Label(self.employee_detail2, text="SEX", fg="#263942", font='Helvetica 12 bold').grid(row=2, column=0,
+                                                                                                 pady=10, padx=5)
+        self.employee_SEX = tk.Entry(self.employee_detail2, borderwidth=3, bg="lightgrey", font='Helvetica 11')
+        self.employee_SEX.grid(row=2, column=1, pady=10, padx=10)
+        tk.Label(self.employee_detail2, text="AGE", fg="#263942", font='Helvetica 12 bold').grid(row=3, column=0,
+                                                                                                 pady=10, padx=5)
+        self.employee_AGE = tk.Entry(self.employee_detail2, borderwidth=3, bg="lightgrey", font='Helvetica 11')
+        self.employee_AGE.grid(row=3, column=1, pady=10, padx=10)
+        tk.Label(self.employee_detail2, text="UNIT", fg="#263942", font='Helvetica 12 bold').grid(row=4, column=0,
+                                                                                                  pady=10, padx=5)
+        self.employee_UNIT = tk.Entry(self.employee_detail2, borderwidth=3, bg="lightgrey", font='Helvetica 11')
+        self.employee_UNIT.grid(row=4, column=1, pady=10, padx=10)
+
+        self.label_button = tk.Label(self)
+        self.button_cancel = tk.Button(self.label_button, text="Cancel",
+                                       command=lambda: controller.show_frame("StartPage"),
+                                       bg="#ffffff", fg="#263942")
+        self.button_next = tk.Button(self.label_button, text="Next", command=self.get_to_update, fg="#ffffff",
+                                     bg="#263942")
+        self.button_update = tk.Button(self.label_button, text="Update", command=self.update_to_database, fg="#ffffff",
+                                       bg="#263942")
+        self.button_delete = tk.Button(self.label_button, text="Delete", command=self.delete_to_database, fg="#ffffff",
+                                       bg="#263942")
+        self.button_cancel.grid(row=0, ipadx=10, ipady=4, column=0, pady=10)
+        tk.Label(self.label_button).grid(row=0, column=1, pady=10, padx=10)
+        tk.Label(self.label_button).grid(row=0, column=3, pady=10, padx=10)
+        self.button_next.grid(row=0, ipadx=10, ipady=4, column=2, pady=10)
+        self.employee_detail.grid(row=1, column=0, ipadx=8, padx=10, pady=10)
+        self.label_button.grid(row=2, column=0, ipadx=8, padx=10, pady=10)
+
+    def get_to_update(self):
+        ID_EMPLOYEE = self.employee_ID.get()
+        with DataManager('Model/data/database/database.db') as db:
+            change_employee = db.get_employee_infor_by_id(ID_EMPLOYEE)
+            if change_employee is None:
+                messagebox.showinfo("Empty", "This ID doesn't exist!")
+                return None
+        self.employee_ID.configure(state='disabled')
+        employee_to_change = UserDetector(*change_employee)
+        self.hide_things(employee_to_change)
+        print("Get success")
+
+    def delete_to_database(self):
+        self.employee_ID.configure(state='disabled')
+        ID_EMPLOYEE = self.employee_ID.get()
+        if messagebox.askokcancel("Are you sure?", "Delete the employee with ID :" + ID_EMPLOYEE):
+            with DataManager('Model/data/database/database.db') as db:
+                if not db.delete_employee_by_id(ID_EMPLOYEE=ID_EMPLOYEE):
+                    messagebox.showinfo("Something went wrong!","Try again")
+            self.show_things()
+
+    def update_to_database(self):
+        with DataManager('Model/data/database/database.db') as db:
+            employee_ID = self.employee_ID.get()
+            employee_NAME = self.employee_NAME.get()
+            employee_AGE = self.employee_AGE.get()
+            employee_SEX = self.employee_SEX.get()
+            employee_UNIT = self.employee_UNIT.get()
+
+            change_employee = db.update_employee_infor_by_id(ID_EMPLOYEE=employee_ID, NAME=employee_NAME,
+                                                             AGE=employee_AGE,
+                                                             SEX=employee_SEX, UNIT=employee_UNIT)
+            if change_employee is None:
+                messagebox.showinfo("Empty", "This ID doesn't exist!")
+                return None
+            elif not change_employee:
+                return
+        self.show_things()
+        messagebox.showinfo("Success", "Update success!")
+
+    def show_things(self):
+        self.employee_ID.configure(state='normal')
+        self.employee_ID.delete(0, "end")
+        self.button_delete.grid_forget()
+        self.button_update.grid_forget()
+        self.employee_detail2.grid_forget()
+        self.note_label.configure(text="Update employee information")
+        self.label_ID.grid(row=0, column=0)
+        self.button_next.grid(row=0, ipadx=10, ipady=4, column=2, pady=10)
+
+    def hide_things(self, employee):
+        self.label_ID.grid_forget()
+        self.employee_detail2.grid(row=0, column=1)
+        self.note_label.configure(text="Update " + employee.ID + " detail")
+        self.employee_NAME.delete(0, "end")
+        self.employee_NAME.insert(0, employee.name)
+        self.employee_AGE.delete(0, "end")
+        self.employee_AGE.insert(0, employee.age)
+        self.employee_SEX.delete(0, "end")
+        self.employee_SEX.insert(0, employee.sex)
+        self.employee_UNIT.delete(0, "end")
+        self.employee_UNIT.insert(0, employee.unit)
+        self.button_next.grid_forget()
+        self.button_update.grid(row=0, ipadx=10, ipady=4, column=2, pady=10)
+        self.button_delete.grid(row=0, ipadx=10, ipady=4, column=4, pady=10)
 
 
 class PageThree(tk.Frame):
@@ -258,8 +388,14 @@ class PageThree(tk.Frame):
 
     def capturing(self):
         messagebox.showinfo("INSTRUCTIONS", "Wait to capture 300 pic of your Face.")
-        x = start_capture(self.controller.active_name)
+        x = start_capture(self.controller.active_employee.ID)
         self.controller.num_of_images = x
+        # save this employee to database
+        with DataManager('Model/data/database/database.db') as db:
+            if db.insert_employee(self.controller.active_employee):
+                print("Success")
+            else:
+                print("Fail")
         self.num_label.config(text=str("Number of images captured = " + str(x) + ". Let retrain your dataset now!"))
         self.back_to_menu.grid(row=2, column=0, ipadx=5, ipady=4, padx=10, pady=20)
 
@@ -273,11 +409,11 @@ class PageThree(tk.Frame):
             if messagebox.askokcancel("WARNING", "Data is not enough that will effect to your result. Do you want to "
                                                  "continue?"):
                 messagebox.showinfo("INSTRUCTIONS", "Wait a few minute.... we are training!")
-                train_one_classifer(self.controller.active_name)
+                train_one_classifer(self.controller.active_employee.ID)
                 messagebox.showinfo("SUCCESS", "The model has been successfully trained!")
                 self.controller.show_frame("StartPage")
         else:
             messagebox.showinfo("INSTRUCTIONS", "Wait a few minute.... we are training!")
-            train_one_classifer(self.controller.active_name)
+            train_one_classifer(self.controller.active_employee.ID)
             messagebox.showinfo("SUCCESS", "The model has been successfully trained!")
             self.controller.show_frame("StartPage")

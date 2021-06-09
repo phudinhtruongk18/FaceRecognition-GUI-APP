@@ -2,10 +2,10 @@ import cv2
 import os
 
 
-def start_capture(name):
+def start_capture(employee_ID):
     face_classifier = cv2.CascadeClassifier("Model/data/haarcascade_frontalface_default.xml")
     # load
-    path = "Model/data/users_photos/" + name
+    path = "Model/data/users_photos/" + employee_ID
 
     try:
         os.makedirs(path)
@@ -34,7 +34,7 @@ def start_capture(name):
             face = cv2.resize(face_cropped(frame), (200, 200))
             # face = face_cropped(frame)
             face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
-            file_name_path = path+"/"+str(numOfData)+name+".jpg"
+            file_name_path = path +"/" + str(numOfData) + employee_ID + ".jpg"
             cv2.imwrite(file_name_path, face)
             cv2.putText(face, str(numOfData), (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 2)
             numOfData += 1

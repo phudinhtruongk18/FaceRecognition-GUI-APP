@@ -4,9 +4,9 @@ import os, cv2
 
 
 # Method to train custom classifier to recognize face
-def train_one_classifer(name):
+def train_one_classifer(employee_ID):
     # Read all the images in custom data-set
-    path = os.path.join("Model\\data\\users_photos\\"+name+"\\")
+    path = os.path.join("Model\\data\\users_photos\\" + employee_ID + "\\")
     faces = []
     ids = []
     pictures = {}
@@ -21,7 +21,7 @@ def train_one_classifer(name):
         img = Image.open(imgpath).convert('L')
         imageNp = np.array(img, 'uint8')
         print(pic)
-        id = int(pic.split(name)[0])
+        id = int(pic.split(employee_ID)[0])
         faces.append(imageNp)
         ids.append(id)
     # Input: Training Image set.
@@ -33,7 +33,7 @@ def train_one_classifer(name):
     clf = cv2.face.LBPHFaceRecognizer_create()
     clf.train(faces, ids)
     # Output: Feature extracted from face image and
-    clf.write("Model/data/classifiers/" + name + "_classifier.xml")
+    clf.write("Model/data/classifiers/" + employee_ID + "_classifier.xml")
 
     print("We have already trained.")
 

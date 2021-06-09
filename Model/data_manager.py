@@ -4,7 +4,7 @@ from datetime import datetime
 from Model.UserClass import UserDetector, Session, RecordDetail
 
 
-class Database:
+class DataManager:
     def __init__(self, link_to_data):
         self._conn = sqlite3.connect(link_to_data)
         self._cursor = self._conn.cursor()
@@ -44,9 +44,9 @@ class Database:
         self.cursor.execute(sql, params or ())
         return self.fetchall()
 
-    def get_all_user_name(self):
+    def get_all_user_ID(self):
         result = self.query("""
-        SELECT NAME FROM EMPLOYEE;
+        SELECT ID FROM EMPLOYEE;
         """)
         my_data = [i[0] for i in result]
         # i[0] is NAME
@@ -159,24 +159,32 @@ class Database:
     def get_employee_infor_by_id(self,ID_EMPLOYEE):
         sql = "SELECT * FROM EMPLOYEE WHERE ID = ?;"
         result = self.query(sql,(ID_EMPLOYEE,))
-
-        return result
+        if not result:
+            return None
+        # return detail about employee instead array with 1 index
+        return result[0]
 
     def update_employee_infor_by_id(self,ID_EMPLOYEE, **kwargs):
-        print(self.get_employee_infor_by_id(ID_EMPLOYEE))
-        # attribute = kwargs.pop('ID', "id CUA NHAN VIEN MOI LAM RA")
-        # print(attribute)
+        change_employee = self.get_employee_infor_by_id(ID_EMPLOYEE)
+        if not change_employee:
+            return None
+        employee_to_change = UserDetector(*change_employee)
 
-        # try:
-        #     sql = "UPDATE TEN_BANG SET cot1 = gtri1, cot2 = gtri2...., cotN = gtriN WHERE [DIEU_KIEN];"
-        #     result = self.query(sql,(ID_EMPLOYEE,))
-        #     # i[0] is ID of the employee
-        #     return True
-        # except sqlite3.Error as e:
-        #     print(e)
-        # return False
+        # ID = kwargs.pop('ID', employee_to_change.ID)
+        NAME = kwargs.pop('NAME', employee_to_change.name)
+        SEX = kwargs.pop('SEX', employee_to_change.sex)
+        AGE = kwargs.pop('AGE', employee_to_change.age)
+        UNIT = kwargs.pop('UNIT', employee_to_change.unit)
 
-with Database('Model/data/database/database.db') as db:
+        try:
+            sql = "UPDATE EMPLOYEE SET NAME = ?, SEX = ?,AGE = ?, UNIT = ? WHERE ID=?;"
+            self.execute(sql,(NAME,SEX,AGE,UNIT,ID_EMPLOYEE))
+            return True
+        except sqlite3.Error as e:
+            print(e)
+        return False
+
+# with Database('Model/data/database/database.db') as db:
     # print(db.get_all_user_name())
 
     # print(db.get_load_infor())
@@ -232,4 +240,5 @@ with Database('Model/data/database/database.db') as db:
     # else:
     #     print("Something went wrong! Try again")
 
-    db.update_employee_infor_by_id("ARAM017")
+    # db.update_employee_infor_by_id(ID_EMPLOYEE="ARAM017",NAME="Phu Dinh",AGE=21,UNIT="FREELANCER")
+    # print(db.get_employee_infor_by_id("ARAM017"))
