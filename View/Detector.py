@@ -3,7 +3,7 @@ import cv2
 from threading import Thread
 import numpy as np
 
-from Model.UserClass import ListUserDetector
+from Model.ClassForSoftware import ListEmployee
 
 # COLOR OF TEXT OF RECTANGLE AROUND FACE
 COLOR_FACE = (250, 128, 114)
@@ -12,16 +12,16 @@ COLOR_FACE_COMPLETE = (255, 255, 0)
 
 # 2 POWERFUL NUM THAT DECIDE IS THAT OUR USER OR NOT
 FIRST_DIFF = 30
-SECOND_DIFF = 45
+SECOND_DIFF = 50
 
 
 class Detector(Thread):
-    def __init__(self, names, menu_UI):
+    def __init__(self, selected_employee, menu_UI):
         # List users
         super().__init__()
         self.progress = 1
         self.menu_UI = menu_UI
-        self.list_users = ListUserDetector(names)
+        self.list_users = ListEmployee(selected_employee)
         self.list_users.show_list_users()
         # List recognizer
         self.recognizer = []
@@ -55,11 +55,12 @@ class Detector(Thread):
             # use numpy to pack our value where index is the same with self.list user
 
     def detected_user(self, index_min, x, y, w, h):
-        user_id = self.list_users[index_min].name
+        user_name = self.list_users[index_min].name
+        user_id = self.list_users[index_min].ID
         self.frame = cv2.rectangle(self.frame, (x, y), (x + w, y + h), COLOR_FACE_COMPLETE, 2)
         self.frame = cv2.putText(self.frame, str(datetime.now().time())[0:5], (x, y - 50), self.font, 3,
                                  COLOR_FACE_COMPLETE, 2, cv2.LINE_AA)
-        self.frame = cv2.putText(self.frame, user_id + "!", (x, y - 4), self.font, 3,
+        self.frame = cv2.putText(self.frame, user_name + "!", (x, y - 4), self.font, 3,
                                  COLOR_FACE_COMPLETE, 2, cv2.LINE_AA)
         # get name of customer and write on the frame
         cv2.imwrite("View/Detected/" + user_id + ".jpg", self.frame)

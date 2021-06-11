@@ -1,8 +1,8 @@
-class ListUserDetector(list):
+class ListEmployee(list):
     def __init__(self, all_employee_data):
         super().__init__()
         for employee in all_employee_data:
-            self.append(UserDetector(*employee))
+            self.append(Employee(*employee))
 
     def show_list_users(self):
         for tempUser in self:
@@ -16,10 +16,10 @@ class ListUserDetector(list):
         return None
 
     def add_backup_user(self, employee):
-        self.append((UserDetector(employee)))
+        self.append((Employee(employee)))
 
 
-class UserDetector:
+class Employee:
 
     def __init__(self, *args):
         if args.__len__() < 5:
@@ -37,7 +37,6 @@ class UserDetector:
 
 class Session:
     def __init__(self, *args):
-        print(args)
         self.ID = args[0]
         self.name = args[1]
         self.duration = args[2]

@@ -1,5 +1,5 @@
 from Controller.DetectedUser import DetectedUser
-from Model.UserClass import UserDetector
+from Model.ClassForSoftware import Employee
 from View.Detector import Detector
 from Model.train_all_classifiers import train_all_classifers
 from Model.create_one_new_classifier import train_one_classifer
@@ -44,14 +44,6 @@ class MainUI(tk.Tk):
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Are you sure?"):
-            # global names
-            # str_names = ""
-            # for name in names:
-            #     if name != "None":
-            #         str_names = str_names + name + " "
-            #
-            # f = open("Model/nameslist.txt", "w")
-            # f.write(str_names)
             self.destroy()
 
 
@@ -99,20 +91,21 @@ class StartPage(tk.Frame):
         button4.grid(row=3, column=0, ipady=4, ipadx=2)
         button5.grid(row=4, column=0, ipady=4, ipadx=2)
         button6.grid(row=5, column=0, ipady=4, ipadx=2)
+        self.current_session = None
+
+    def get_select_list(self, selected_session):
+        self.current_session = selected_session
+        print(self.current_session,"<-self.current_session")
 
     def select_session(self):
-        self.SelectWindow.show()
+        with DataManager('Model/data/database/database.db') as db:
+            ALL_ID = db.get_load_infor()
+            print(ALL_ID)
+        self.controller .withdraw()
+        self.SelectWindow.show(ALL_ID)
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Are you sure?"):
-            # global names
-            # str_names = ""
-            # for i in names:
-            #     if i != "None":
-            #         str_names = str_names + i + " "
-            #
-            # f = open("Model/nameslist.txt", "w")
-            # f.write(str_names)
             self.controller.destroy()
 
     def train_data(self):
@@ -120,15 +113,18 @@ class StartPage(tk.Frame):
         self.controller.list_users = train_all_classifers()
 
     def openwebcam(self):
+        if not self.current_session:
+            messagebox.showerror("Error","Select session first!")
+            return
         with DataManager('Model/data/database/database.db') as db:
-            ALL_ID = db.query("SELECT * FROM EMPLOYEE")
-            print(ALL_ID)
-
+            ALL_ID = db.get_all_employee_by_session_ID(self.current_session)
+        print(ALL_ID)
         # make some process here after load page
-        if ALL_ID is not None:
+        if ALL_ID:
             print("Detecting....")
             self.progress_bar['value'] = 0
             self.progress_bar.grid(row=5, column=1, sticky="nsew")
+
             self.dec = Detector(ALL_ID, self)
             self.dec.start()
         else:
@@ -167,7 +163,6 @@ class StartPage(tk.Frame):
     def open_detect_UI(self):
         self.progress_bar.grid_forget()
         self.controller.withdraw()
-
         self.DetectedWindow.show(self.timer_minute)
 
     def update_detected_text(self, num_of_list, num_of_left):
@@ -241,7 +236,7 @@ class PageOne(tk.Frame):
             messagebox.showinfo("Not alow Null", "Type all there information!")
             return
 
-        temp_employee = UserDetector(employ_ID, employ_NAME, employ_SEX, employ_AGE, employ_UNIT)
+        temp_employee = Employee(employ_ID, employ_NAME, employ_SEX, employ_AGE, employ_UNIT)
 
         self.controller.active_employee = temp_employee
         # self.controller.frames["PageTwo"].refresh_names()
@@ -311,7 +306,7 @@ class PageTwo(tk.Frame):
                 messagebox.showinfo("Empty", "This ID doesn't exist!")
                 return None
         self.employee_ID.configure(state='disabled')
-        employee_to_change = UserDetector(*change_employee)
+        employee_to_change = Employee(*change_employee)
         self.hide_things(employee_to_change)
         print("Get success")
 

@@ -11,18 +11,18 @@ Web Front-End Designer: [Pham Thanh Long]()<br>
 
 # Simple Face Attendance Recorder System
 
-  - Add information and collect face data of the Employee(Not yet)
-  - Update information and face data of the Employee(Not yet)
+  - Add information and collect face data of the Employee<b>(on testing)</b>
+  - Update information and face data of the Employee<b>(on testing)</b>
   - Build Face Classifier 
   - Retrain all Face Classifier 
-  - Select the Employee and time for Attendance Session(Not yet)
-  - Load Saved Attendance Session (Not yet)
+  - Select the Employee and time for Attendance Session<b>(on testing)</b>
+  - Load Saved Attendance Session <b>(on testing)</b>
   - Start Attendance Session 
   - Detect the employee by face in realtime
   - Record the employee 
-  - Update recorders in Database(Not yet)
-  - Backup attendance<b>(on testing)</b>
-  - Collect and save Recorders after every session in Excel format (Not yet)
+  - Update recorders in Database<b>(on plan)</b>
+  - Backup attendance
+  - Collect and save Recorders after every session in Excel format <b>(on plan)</b>
 
 # Support Web Version  
   - Select the Employee and time for Attendance Session(Not yet)
