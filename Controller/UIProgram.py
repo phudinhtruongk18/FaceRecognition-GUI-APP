@@ -51,17 +51,13 @@ class StartPage(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        self.timer_minute = 1
-        new_window = tk.Toplevel(self)
-        self.DetectedWindow = DetectedUser(new_window, self)
-
-        new_window2 = tk.Toplevel(self)
-        self.SelectWindow = SelectSession(new_window2, self)
+        self.timer_minute = 0
 
         self.controller = controller
         self.dec = None
-        # load = Image.open("homepagepic.png")
-        # load = load.resize((250, 250), Image.ANTIALIAS)
+        self.current_session = None
+        self.DetectedWindow = None
+
         render = PhotoImage(file='View/Stock/homepagepic.png')
         img = tk.Label(self, image=render)
         img.image = render
@@ -77,7 +73,7 @@ class StartPage(tk.Frame):
         button1 = tk.Button(label1, text="   Add a user  ", fg="#ffffff", bg="#263942",
                             command=lambda: self.controller.show_frame("PageOne"))
 
-        button2 = tk.Button(label1, text="   Change Infor  ", fg="#ffffff", bg="#263942",
+        button2 = tk.Button(label1, text="   Change information  ", fg="#ffffff", bg="#263942",
                             command=lambda: self.controller.show_frame("PageTwo"))
         button3 = tk.Button(self, text="  Retrain dataset ", fg="#ffffff", bg="#263942", command=self.train_data)
         button4 = tk.Button(self, text="   Select Session  ", fg="#ffffff", bg="#263942", command=self.select_session)
@@ -91,18 +87,17 @@ class StartPage(tk.Frame):
         button4.grid(row=3, column=0, ipady=4, ipadx=2)
         button5.grid(row=4, column=0, ipady=4, ipadx=2)
         button6.grid(row=5, column=0, ipady=4, ipadx=2)
-        self.current_session = None
 
     def get_select_list(self, selected_session):
         self.current_session = selected_session
-        print(self.current_session,"<-self.current_session")
 
     def select_session(self):
+        new_window2 = tk.Toplevel(self)
+        SelectWindow = SelectSession(new_window2, self)
         with DataManager('Model/data/database/database.db') as db:
             ALL_ID = db.get_load_infor()
-            print(ALL_ID)
-        self.controller .withdraw()
-        self.SelectWindow.show(ALL_ID)
+        self.controller.withdraw()
+        SelectWindow.show(ALL_ID)
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Are you sure?"):
@@ -113,63 +108,83 @@ class StartPage(tk.Frame):
         self.controller.list_users = train_all_classifers()
 
     def openwebcam(self):
+
         if not self.current_session:
-            messagebox.showerror("Error","Select session first!")
+            messagebox.showerror("Error", "Select session first!")
             return
         with DataManager('Model/data/database/database.db') as db:
+            # get employee in selected session
             ALL_ID = db.get_all_employee_by_session_ID(self.current_session)
-        print(ALL_ID)
-        # make some process here after load page
+            # get timer for UI_detected_user
+            self.timer_minute = db.get_duration_by_session_ID(self.current_session)
+            # create new RECORDER for session and get ID_RECORDER back
+            ID_RECORDER = db.insert_and_get_id_recorder(self.current_session)
+        if ID_RECORDER is not None:
+            print("Success create new RECORDER ", ID_RECORDER)
+        else:
+            messagebox.showinfo("Database error", "Something wrong when create new ID_RECORDER in UIProgram")
+            return
+        new_window = tk.Toplevel(self)
+        self.DetectedWindow = DetectedUser(new_window, self)
+
         if ALL_ID:
             print("Detecting....")
             self.progress_bar['value'] = 0
             self.progress_bar.grid(row=5, column=1, sticky="nsew")
 
-            self.dec = Detector(ALL_ID, self)
+            self.dec = Detector(ID_RECORDER, ALL_ID, self)
             self.dec.start()
         else:
             messagebox.showinfo("INSTRUCTIONS", "List users is empty. Let add someone first!")
 
-    def backup_detected_user_with_index_to_detector(self, index_to_backup):
-        # work with sql here index_to_backup to infor of user
-        # with
-        self.dec.backup_detected_user_with_index(index_to_backup)
+    def backup_detected_user_with_id_to_detector(self, id_to_backup, detected_times):
+        # call dec to work with sql
+        if detected_times > 0:
+            self.dec.backup_detected_user_with_id_but_detected_before(id_to_backup, detected_times)
+        else:
+            self.dec.backup_detected_user_with_id(id_to_backup)
 
-    def backup_detected_user_with_id_to_detector(self, id_to_backup):
-        # work with sql here index_to_backup to infor of user
-        # with
-        self.dec.backup_detected_user_with_id(id_to_backup)
+    def find_state_of_users_by_id(self, id_to_check):
+        times = self.dec.find_state_of_users(id_to_check)
+        return times
 
     def detected_user_from_detector(self, id_to_check):
         # this method
-        # return isRecorded = false and Index if employee ID non attendance yet
-        # return isRecorded = true and id_name if employee ID attendance already
+        # return isRecorded = false and detected_times if employee ID non attendance yet
+        # return isRecorded = true and detected_times if employee ID attendance already
         # return None and None if ID doesn't exist in system
 
-        # return index of the user
-        found_index = self.dec.find_index_of_users(id_to_check)
-        # if this id in Detector
-        if found_index is not None:
-            return False, found_index
+        # return detected_time of the employee
+        detected_times = self.find_state_of_users_by_id(id_to_check)
+        if detected_times > 0:
+            # if this id Loaded Employee so -> this ID already check in by face ID before.
+            return True, detected_times
         # if this id not in Detector check again in Loaded Employee list
         else:
-            if id_to_check not in names:
+            with DataManager('Model/data/database/database.db') as db:
+                all_id = db.get_all_employee_id_by_session_ID(self.current_session)
+            if id_to_check not in all_id:
                 # if this id not in Loaded Employee so -> this ID doesn't exist in system
                 return None, None
             else:
-                # if this id Loaded Employee so -> this ID already check in by face ID before.
-                return True, id_to_check
+                # if this id Loaded Employee in list but doesn't recognize
+                return False, detected_times
 
     def open_detect_UI(self):
         self.progress_bar.grid_forget()
         self.controller.withdraw()
-        self.DetectedWindow.show(self.timer_minute)
+        with DataManager('Model/data/database/database.db') as db:
+            list_employee = db.get_all_employee_by_session_ID(self.current_session)
+        self.DetectedWindow.show(self.timer_minute, list_employee)
 
     def update_detected_text(self, num_of_list, num_of_left):
         self.DetectedWindow.update_detected_text(num_of_list=num_of_list, num_of_left=num_of_left)
 
     def add_detected_user(self, user_id):
         self.DetectedWindow.add_detected_user(user_id)
+
+    def add_detected_user_backup(self, user_id):
+        self.DetectedWindow.add_detected_user_backup(user_id)
 
     def update_frame(self, frame):
         self.DetectedWindow.update_image(frame)
@@ -233,13 +248,12 @@ class PageOne(tk.Frame):
             messagebox.showinfo("Exception error", str(e))
             return
         if "" in [employ_NAME, employ_AGE, employ_SEX, employ_UNIT]:
-            messagebox.showinfo("Not alow Null", "Type all there information!")
+            messagebox.showinfo("Not allow Null", "Type all there information!")
             return
 
         temp_employee = Employee(employ_ID, employ_NAME, employ_SEX, employ_AGE, employ_UNIT)
 
         self.controller.active_employee = temp_employee
-        # self.controller.frames["PageTwo"].refresh_names()
         self.controller.show_frame("PageThree")
 
 
@@ -247,7 +261,6 @@ class PageTwo(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        global names
         self.controller = controller
         self.note_label = tk.Label(self, text="Update employee information", fg="#263942", font='Helvetica 12 bold')
         self.note_label.grid(row=0, column=0)
@@ -308,7 +321,6 @@ class PageTwo(tk.Frame):
         self.employee_ID.configure(state='disabled')
         employee_to_change = Employee(*change_employee)
         self.hide_things(employee_to_change)
-        print("Get success")
 
     def delete_to_database(self):
         self.employee_ID.configure(state='disabled')
@@ -316,7 +328,7 @@ class PageTwo(tk.Frame):
         if messagebox.askokcancel("Are you sure?", "Delete the employee with ID :" + ID_EMPLOYEE):
             with DataManager('Model/data/database/database.db') as db:
                 if not db.delete_employee_by_id(ID_EMPLOYEE=ID_EMPLOYEE):
-                    messagebox.showinfo("Something went wrong!","Try again")
+                    messagebox.showinfo("Something went wrong!", "Try again")
             self.show_things()
 
     def update_to_database(self):

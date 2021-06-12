@@ -11,18 +11,18 @@ Web Front-End Designer: [Pham Thanh Long]()<br>
 
 # Simple Face Attendance Recorder System
 
-  - Add information and collect face data of the Employee<b>(on testing)</b>
-  - Update information and face data of the Employee<b>(on testing)</b>
+  - Add information and collect face data of the Employee
+  - Update information and face data of the Employee
   - Build Face Classifier 
   - Retrain all Face Classifier 
-  - Select the Employee and time for Attendance Session<b>(on testing)</b>
-  - Load Saved Attendance Session <b>(on testing)</b>
+  - Select the Employee and time for Attendance Session
+  - Load Saved Attendance Session
   - Start Attendance Session 
   - Detect the employee by face in realtime
   - Record the employee 
-  - Update recorders in Database<b>(on plan)</b>
+  - Update recorders in Database<b>(on testing)</b>
   - Backup attendance
-  - Collect and save Recorders after every session in Excel format <b>(on plan)</b>
+  - Collect and save Recorders after every session in Excel format <b>(on testing)</b>
 
 # Support Web Version  
   - Select the Employee and time for Attendance Session(Not yet)
@@ -42,18 +42,21 @@ $ pip install -r  requirements.txt
 $ python main.py
 ```
 
-[comment]: <> (# APP GUI)
+# APP GUI
 
-[comment]: <> (### Home Page)
+### Home Page
 
-[comment]: <> (![homepage]&#40;https://i.ibb.co/c62qvR2/home-page.png&#41;)
+![homepage](https://i.ibb.co/G9d7CWL/Picture1.png)
 
-[comment]: <> (### Add a User <br>)
+[comment]: <> (### Add and update the Employee <br>)
 
-[comment]: <> (Add the user you want to train a classifier for <br>)
+[comment]: <> (<br>Add<br>)
 
-[comment]: <> (![page1]&#40;https://i.ibb.co/t8gdq6s/adduser.png&#41;<br>)
+[comment]: <> (![add]&#40;https://i.ibb.co/ZY40gF9/Picture2.png&#41;)
 
+[comment]: <> (<br>-Update<br>)
+
+[comment]: <> (![update]&#40;https://i.ibb.co/3sKYRdm/Picture3.png&#41;)
 
 [comment]: <> (### Capture Data and Train Classifier<br>)
 
@@ -61,11 +64,19 @@ $ python main.py
 
 [comment]: <> (![page2]&#40;https://i.ibb.co/D8JgYhN/capandtraindata.png&#41;<br>)
 
-[comment]: <> (### Users List<br>)
+[comment]: <> ([comment]: <> &#40;### Users List<br>&#41;)
 
-[comment]: <> (List of all the users<br>)
+[comment]: <> ([comment]: <> &#40;List of all the users<br>&#41;)
 
-[comment]: <> (![page3]&#40;https://i.ibb.co/1KwfVVV/dropdown.png&#41;<br>)
+[comment]: <> ([comment]: <> &#40;![page3]&#40;https://i.ibb.co/1KwfVVV/dropdown.png&#41;<br>&#41;)
 
-<br>
+[comment]: <> (<br>)
+### Select your session
+
+![select](https://i.ibb.co/P9T62gs/Picture4.png)
+
+### Result
+
+![select](https://i.ibb.co/hLQfCY2/Picture5.png)
+
 **Free Software, Hell Yeah!**

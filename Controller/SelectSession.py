@@ -119,10 +119,13 @@ class SelectSession:
         x, y = ws / 2 - w / 2 - 50, hs / 2 - h / 2
         confirm_box.geometry('%dx%d+%d+%d' % (w, h, x, y))
         confirm_box.configure(bg="#faf3e0")
-        employee_in_session = self.get_all_name_employee_by_id_session(self.found_session.ID)
+
+        with DataManager('Model/data/database/database.db') as db:
+            list_employee_name = db.get_all_employee_name_by_session_ID(self.found_session.ID)
+
         string_employee = "\n"
         column = 1
-        for index, temp_employee in enumerate(employee_in_session):
+        for index, temp_employee in enumerate(list_employee_name):
             string_employee += temp_employee
             if column == 4:
                 string_employee += "\n"
@@ -158,7 +161,6 @@ class SelectSession:
     def delete_current_one(self):
         if messagebox.askokcancel("Delete", "Are you sure?"):
             # work with sql later on
-            print("xoa ne chac chua")
             session_ID = self.found_session.ID
             with DataManager('Model/data/database/database.db') as db:
                 if db.delete_session_by_id(session_ID):
@@ -168,7 +170,7 @@ class SelectSession:
                     return
             self.deselected_all()
             self.string_selected_session.set("Select Your Session")
-            self.reset_saved_sesions()
+            self.reset_saved_sessions()
 
     def select_this_session(self):
         if self.found_session is None:
@@ -182,24 +184,14 @@ class SelectSession:
                 return temp_session
         return None
 
-    def get_all_id_employee_by_id_session(self, found_session_ID):
-        with DataManager('Model/data/database/database.db') as db:
-            list_employee_id = db.get_all_employee_id_by_session_ID(found_session_ID)
-        return list_employee_id
-
-    def get_all_name_employee_by_id_session(self, found_session_ID):
-        with DataManager('Model/data/database/database.db') as db:
-            list_employee_name = db.get_all_employee_name_by_session_ID(found_session_ID)
-        return list_employee_name
-
-    def show_this_session(self, *args):
+    def show_this_session(self, *_):
         # get id of session in menu option
         self.found_session = None
         self.picked_user_IDs.clear()
 
         id_of_session = self.string_selected_session.get()
         if id_of_session.__eq__("Select Your Session"):
-            print("Something wrong with data")
+            print("Select state")
             return None
         # get session information by id in list_session
         self.found_session = self.get_session_session_list_by_id(id_of_session)
@@ -209,7 +201,9 @@ class SelectSession:
         self.string_selected_session.set(self.found_session.name)
         self.deselected_all()
 
-        self.picked_user_IDs = self.get_all_id_employee_by_id_session(self.found_session.ID)
+        with DataManager('Model/data/database/database.db') as db:
+            self.picked_user_IDs = db.get_all_employee_id_by_session_ID(self.found_session.ID)
+
         for temp_employee in self.picked_user_IDs:
             for temp_btn in self.list_buttons:
                 if temp_btn.cget("text") == temp_employee:
@@ -258,7 +252,7 @@ class SelectSession:
                 print("Fail!")
 
         self.string_selected_session.set("Select Your Session")
-        self.reset_saved_sesions()
+        self.reset_saved_sessions()
         add_box_temp.destroy()
 
     def save_this_session(self):
@@ -374,13 +368,13 @@ class SelectSession:
             btn.configure(bg="pink")
         else:
             print("Something wrong in pick employee")
-        print(self.picked_user_IDs)
 
     def cancel_select(self):
         # hide this window
-        self.master.withdraw()
+        self.master.destroy()
+        # self.master.withdraw()
         # reset for new session
-        self.reset_data()
+        # self.reset_data()
         # show up menuUI
         self.menuUI.controller.deiconify()
 
@@ -411,14 +405,13 @@ class SelectSession:
         temp_session_list = []
         with DataManager('Model/data/database/database.db') as db:
             all_session = db.get_all_session()
-            for temp_sesion in all_session:
-                temp_session_list.append(Session(*temp_sesion))
-        print(temp_session_list.__len__(), " <-- num of session")
+            for temp_session in all_session:
+                temp_session_list.append(Session(*temp_session))
         self.session_list = temp_session_list
 
     def show(self, all_record_to_pick):
         self.load_all_session()
-        self.reset_saved_sesions()
+        self.reset_saved_sessions()
         self.list_all_user = ListEmployee(all_employee_data=all_record_to_pick)
         self.add_all_user()
 
@@ -438,12 +431,11 @@ class SelectSession:
             wi, he = self.button_size, self.button_size * ratio
         return int(wi), int(he)
 
-    def reset_saved_sesions(self):
+    def reset_saved_sessions(self):
         self.load_all_session()
         # change database here
         self.menu_option.delete(0, "end")
         for session in self.session_list:
-            print(session.name)
             # set session.ID for trace after select in option menu
             self.menu_option.add_command(label=session.name,
                                          command=lambda value=session.ID: self.string_selected_session.set(value))

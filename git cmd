@@ -1,20 +1,20 @@
 git add *
 git rm -r --cached ./Model/data/classifiers/*
+git rm -r --cached ./Model/data/NotEnoughData/*
+git rm -r --cached ./Model/data/NotForNow/*
 git rm -r --cached ./Model/data/users_photos/*
 git rm -r --cached ./Model/data/video/*
 git rm -r --cached ./Model/data/WrongData/*
-git rm -r --cached ./Model/data/NotEnoughData/*
-git rm -r --cached ./Model/data/NotForNow/*
 
 git rm -r --cached ./.idea/
 
-git add ./Model/data/classifiers/PhuDinh_classifier.xml
-git add ./Model/data/users_photos/phu
-git add ./Model/data/video/me2.mp4
-git add ./Model/data/WrongData/PhapThanh/0PhapThanh.jpg
-git add ./Model/data/NotEnoughData/TrongNhan/0TrongNhan.jpg
-
-git commit -m "working with session in database
-"
+git commit -m "working with detector in database"
 
 git push
+
+
+git add ./Model/data/classifiers/ARAM017_classifier.xml
+git add ./Model/data/users_photos/ARAM017/ARAM017/0ARAM017.jpg
+git add ./Model/data/video/dilam4.mp4
+git add ./Model/data/WrongData/PhapThanh/0PhapThanh.jpg
+git add ./Model/data/NotEnoughData/TrongNhan/0TrongNhan.jpg

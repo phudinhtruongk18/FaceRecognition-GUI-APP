@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
 
-from Model.ClassForSoftware import Employee, Session, RecordDetail
+from Model.ClassForSoftware import Employee, Session
 
 
 class DataManager:
@@ -113,6 +113,13 @@ class DataManager:
         result = self.query(sql, (ID_SESSION,))
         return result
 
+    def get_duration_by_session_ID(self, ID_SESSION):
+        sql = F"SELECT DURATION FROM SESSION WHERE ID= ?;"
+        result = self.query(sql, (ID_SESSION,))
+        if result:
+            return result[0][0]
+        return result
+
     def get_all_employee_name_by_session_ID(self, ID_SESSION):
         sql = F"SELECT NAME FROM EMPLOYEE WHERE ID IN (SELECT ID_EMPLOYEE FROM SAVED_SESSION WHERE ID_SESSION = ?)"
         result = self.query(sql, (ID_SESSION,))
@@ -123,10 +130,9 @@ class DataManager:
     def insert_and_get_id_recorder(self, ID_SESSION):
         try:
             now = datetime.now()
-            time = now.strftime('%Y-%m-%d')
             ID_RECORDER = now.strftime('%Y-%m-%d %H:%M:%S')
-            self.execute('INSERT INTO RECORDER (ID,ID_SESSION,RECORD_DATE) VALUES (?, ?, ?)',
-                         (ID_RECORDER, ID_SESSION, time))
+            self.execute('INSERT INTO RECORDER (ID,ID_SESSION) VALUES (?, ?)',
+                         (ID_RECORDER, ID_SESSION))
             # check = self.query('SELECT * FROM EMPLOYEE WHERE ID =?', (employee.ID,))
             # if check == employ -> return true
             return ID_RECORDER
@@ -198,6 +204,14 @@ class DataManager:
         # return detail about employee instead array with 1 index
         return result[0]
 
+    def get_state_of_employee(self, ID_RECORDER, ID_EMPLOYEE):
+        sql = "SELECT * FROM DETAIL_RECORD WHERE ID_RECORDER = ? AND ID_EMPLOYEE = ?;"
+        result = self.query(sql, (ID_RECORDER, ID_EMPLOYEE))
+        print(result)
+        print(result.__len__(), "<- len")
+        len_of_list = result.__len__()
+        return len_of_list
+
     def update_employee_infor_by_id(self, ID_EMPLOYEE, **kwargs):
         change_employee = self.get_employee_infor_by_id(ID_EMPLOYEE)
         if not change_employee:
@@ -219,51 +233,51 @@ class DataManager:
         return False
 
 # with Database('Model/data/database/database.db') as db:
-# print(db.get_all_user_name())
+    # print(db.get_all_user_name())
 
-# print(db.get_load_infor())
+    # print(db.get_load_infor())
 
-# if db.insert_employee(UserDetector('TEST002', 'Phu Dinh', 'MALE', 28, 'FREELANCER')):
-#     print("Done")
-# else:
-#     print("Can't add this employee! Try Again")
+    # if db.insert_employee(UserDetector('TEST002', 'Phu Dinh', 'MALE', 28, 'FREELANCER')):
+    #     print("Done")
+    # else:
+    #     print("Can't add this employee! Try Again")
 
-# if db.insert_session(Session("TEST002","TEST NEK BN ƠI",69)):
-#     print("Done")
-# else:
-#     print("Can't add this employee! Try Again")
+    # if db.insert_session(Session("TEST002","TEST NEK BN ƠI",69)):
+    #     print("Done")
+    # else:
+    #     print("Can't add this employee! Try Again")
 
-# # RECORDER
-# ID_SESSION = "TEST_SESSION_001"
-# ID_RECORDER = db.insert_and_get_id_recorder(ID_SESSION)
-# if result is not None:
-#     print(ID_RECORDER)
-#     print("Success")
-# else:
-#     print("Some thing Wrong when create new recorder")
+    # # RECORDER
+    # ID_SESSION = "TEST_SESSION_001"
+    # ID_RECORDER = db.insert_and_get_id_recorder(ID_SESSION)
+    # if result is not None:
+    #     print(ID_RECORDER)
+    #     print("Success")
+    # else:
+    #     print("Some thing Wrong when create new recorder")
 
-# ADD NEW RECORD
-# IS_BACKUP = True
-# ID_EMPLOYEE = "ARAM001"
-# ID_RECORDER = "THANKLONG001"
-# if db.insert_new_record(IS_BACKUP, ID_EMPLOYEE, ID_RECORDER):
-#     print(ID_RECORDER)
-#     print("Success")
-# else:
-#     print("Some thing Wrong when create new recorder")
+    # ADD NEW RECORD
+    # IS_BACKUP = True
+    # ID_EMPLOYEE = "ARAM001"
+    # ID_RECORDER = "THANKLONG001"
+    # if db.insert_new_record(IS_BACKUP, ID_EMPLOYEE, ID_RECORDER):
+    #     print(ID_RECORDER)
+    #     print("Success")
+    # else:
+    #     print("Some thing Wrong when create new recorder")
 
-# print(db.get_all_recorder())
-# my_recorder = db.get_recorder_by_time(begin_time="2019-02-20",end_time="2022-02-28")
-# for temp2 in db.get_all_detail_record_by_recorder_id(my_recorder[0]):
-#     thanklong = RecordDetail(temp2[0], temp2[1], temp2[2], temp2[3], temp2[4])
-#     print(thanklong.id_recorder)
+    # print(db.get_all_recorder())
+    # my_recorder = db.get_recorder_by_time(begin_time="2019-02-20",end_time="2022-02-28")
+    # for temp2 in db.get_all_detail_record_by_recorder_id(my_recorder[0]):
+    #     thanklong = RecordDetail(temp2[0], temp2[1], temp2[2], temp2[3], temp2[4])
+    #     print(thanklong.id_recorder)
 
-# delete
-# db.insert_employee(UserDetector('TEST002', 'Phu Dinh', 'MALE', 28, 'FREELANCER'))
-# if db.delete_employee_by_id('TEST002'):
-#     print("Succes")
-# else:
-#     print("Something went wrong! Try again")
+    # delete
+    # db.insert_employee(UserDetector('TEST002', 'Phu Dinh', 'MALE', 28, 'FREELANCER'))
+    # if db.delete_employee_by_id('TEST002'):
+    #     print("Success")
+    # else:
+    #     print("Something went wrong! Try again")
 
-# db.update_employee_infor_by_id(ID_EMPLOYEE="ARAM017",NAME="Phu Dinh",AGE=21,UNIT="FREELANCER")
-# print(db.get_employee_infor_by_id("ARAM017"))
+    # db.update_employee_infor_by_id(ID_EMPLOYEE="ARAM017",NAME="Phu Dinh",AGE=21,UNIT="FREELANCER")
+    # print(db.get_employee_infor_by_id("ARAM017"))

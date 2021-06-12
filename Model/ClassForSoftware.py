@@ -8,15 +8,27 @@ class ListEmployee(list):
         for tempUser in self:
             print(tempUser.name)
 
-    def find_index_by_id(self,id_to_check):
-        for index,temp_user in enumerate(self):
+    def find_index_by_id(self, id_to_check):
+        for index, temp_user in enumerate(self):
             if temp_user.ID == id_to_check:
-                print(temp_user,id_to_check,"found")
                 return index
         return None
 
     def add_backup_user(self, employee):
         self.append((Employee(employee)))
+
+    def get_infor_employee(self, id_to_check):
+        for index, temp_user in enumerate(self):
+            if temp_user.ID == id_to_check:
+                result = temp_user.name + " - " + str(temp_user.age) + "\n" + temp_user.sex + " - " + temp_user.unit
+                return result
+        return None
+
+    def get_name_employee(self, id_to_check):
+        for index, temp_user in enumerate(self):
+            if temp_user.ID == id_to_check:
+                return temp_user.name
+        return None
 
 
 class Employee:

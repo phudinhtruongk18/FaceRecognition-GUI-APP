@@ -3,6 +3,9 @@ from tkinter import ttk, messagebox
 import tkinter as jra
 from PIL import ImageTk, Image
 
+from Model.ClassForSoftware import ListEmployee, Employee
+from Model.data_manager import DataManager
+
 
 class DetectedUser:
     def __init__(self, master_temp, menuUI):
@@ -20,6 +23,7 @@ class DetectedUser:
 
         style = ttk.Style()
         self.font = ('Helvetica', 26, "bold")
+        self.font2 = ('Helvetica', 18, "bold")
         style.configure('W.TButton', font=self.font, bg="#faf3e0", fg="#263942")
 
         self.ROOT_FRAME = ttk.Frame(self.master, height=hCanvas, style="W.TButton")
@@ -57,7 +61,6 @@ class DetectedUser:
         self.left_frame = jra.Frame(self.ROOT_FRAME)
         self.left_frame.grid(row=0, column=2)
         self.canvas = jra.Canvas(self.left_frame, width=int(w * 6.5 / 10), height=hCanvas - 50, bg="#faf3e0")
-        # self.canvas = jra.Canvas(self.left_frame)
         self.canvas.pack(side=jra.LEFT, fill=jra.BOTH, expand=1)
         self.scroll_bar = ttk.Scrollbar(self.left_frame, orient=jra.VERTICAL, command=self.canvas.yview)
         self.scroll_bar.pack(side=jra.RIGHT, fill=jra.Y)
@@ -81,6 +84,7 @@ class DetectedUser:
         self.timeBegin = 0
         self.timer_second = 0
         self.button_size = 300
+        self.list_employee = []
 
     def backup_plan(self, id_to_backup, backup_box_temp):
         # Get text from this small backup box and do some research in some list and backup them by the ID user input
@@ -88,17 +92,13 @@ class DetectedUser:
         # isRecorded = true and id_name if employee ID attendance already
         # None and None if ID doesn't exist in system
         id_to_backup = str(id_to_backup)
-        isRecorded, IDorName = self.menuUI.detected_user_from_detector(id_to_backup)
+        isRecorded, detected_times = self.menuUI.detected_user_from_detector(id_to_backup)
         if isRecorded is None:
             messagebox.showinfo(" Try Again!", "Your ID" + id_to_backup + " doesn't exist!")
         else:
-            if isRecorded:
-                self.menuUI.backup_detected_user_with_id_to_detector(IDorName)
-                # messagebox.showinfo(id_to_backup + " da den!", "Your ID look old!")
-            if not isRecorded:
-                self.menuUI.backup_detected_user_with_index_to_detector(IDorName)
-                # messagebox.showinfo(id_to_backup + " chua den!", "Your ID look new!")
-        backup_box_temp.destroy()
+            self.menuUI.backup_detected_user_with_id_to_detector(id_to_backup=id_to_backup,
+                                                                 detected_times=detected_times)
+            backup_box_temp.destroy()
 
     # Get input ID from user and do self.backup_plan()
     def open_backup_plan(self):
@@ -171,7 +171,8 @@ class DetectedUser:
         self.row = 0
         self.column = 0
 
-    def show(self, timer):
+    def show(self, timer, list_employee):
+        self.list_employee = ListEmployee(list_employee)
         # minutes to seconds
         self.timer_second = timer * 60
         self.timeBegin = time.perf_counter()
@@ -184,6 +185,7 @@ class DetectedUser:
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
 
     def on_mouse_scroll(self, event):
+        print(event)
         self.canvas.yview_scroll(-1 * int((event.delta / 150)), "units")
 
     def get_right_size(self, wi, he):
@@ -194,10 +196,22 @@ class DetectedUser:
             wi, he = self.button_size, self.button_size * ratio
         return int(wi), int(he)
 
-    def add_detected_user(self, user_id):
+    def add_detected_user_backup(self, user_id):
+        # sub 1 because after check and add to database detected_times is counting itself
+        detected_times = self.menuUI.find_state_of_users_by_id(user_id) - 1
         # get employee photo
-        link_user = "View/Detected/" + user_id + ".jpg"
+        if detected_times > 0:
+            link_user = "View/Backup/" + user_id + "-times-" + str(detected_times) + ".jpg"
+        else:
+            link_user = "View/Backup/" + user_id + ".jpg"
+
         user_pic = Image.open(link_user)
+
+        with DataManager('Model/data/database/database.db') as db:
+            user = db.get_employee_infor_by_id(user_id)
+        temp_user = Employee(*user)
+        employee_name = temp_user.name
+
         # get right size of user picture and resize to make it good looking and fit to the button
         img = ImageTk.PhotoImage(user_pic.resize(self.get_right_size(user_pic.width, user_pic.height), Image.ANTIALIAS))
         # add to self.list_images -> make it visible (I have tried make it simpler but it doesn't work)
@@ -206,7 +220,7 @@ class DetectedUser:
         index = self.list_images.__len__() - 1
 
         button = jra.Button(self.secondFrame, image=self.list_images[index], width=300, height=300, bg="#faf3e0")
-        label = jra.Label(self.secondFrame, text=user_id, bg="#faf3e0", font=self.font)
+        label = jra.Label(self.secondFrame, text=employee_name, fg="#263942", font=self.font2)
         if self.column == 4:
             self.column = 0
             self.row += 2
@@ -214,7 +228,37 @@ class DetectedUser:
         button.bind('<Enter>', lambda event_temp: self.on_start_hover(_=event_temp,
                                                                       button_temp=button, user_id_temp=user_id,
                                                                       label_temp=label))
-        button.bind('<Leave>', lambda event_temp: self.on_end_hover(_=event_temp, user_id_temp=user_id,
+        button.bind('<Leave>', lambda event_temp: self.on_end_hover(_=event_temp, employee_name_temp=employee_name,
+                                                                    button_temp=button, label_temp=label))
+        button.grid(row=self.row, column=self.column)
+        label.grid(row=self.row + 1, column=self.column)
+
+        # add to list_buttons -> take control this button
+        self.list_buttons.append(button)
+        self.list_labels.append(label)
+
+    def add_detected_user(self, user_id):
+        # get employee photo
+        link_user = "View/Detected/" + user_id + ".jpg"
+        user_pic = Image.open(link_user)
+        employee_name = self.list_employee.get_name_employee(user_id)
+        # get right size of user picture and resize to make it good looking and fit to the button
+        img = ImageTk.PhotoImage(user_pic.resize(self.get_right_size(user_pic.width, user_pic.height), Image.ANTIALIAS))
+        # add to self.list_images -> make it visible (I have tried make it simpler but it doesn't work)
+        self.list_images.append(img)
+        # do some math to grid in this window
+        index = self.list_images.__len__() - 1
+
+        button = jra.Button(self.secondFrame, image=self.list_images[index], width=300, height=300, bg="#faf3e0")
+        label = jra.Label(self.secondFrame, text=employee_name, fg="#263942", font=self.font2)
+        if self.column == 4:
+            self.column = 0
+            self.row += 2
+        self.column += 1
+        button.bind('<Enter>', lambda event_temp: self.on_start_hover(_=event_temp,
+                                                                      button_temp=button, user_id_temp=user_id,
+                                                                      label_temp=label))
+        button.bind('<Leave>', lambda event_temp: self.on_end_hover(_=event_temp, employee_name_temp=employee_name,
                                                                     button_temp=button, label_temp=label))
         button.grid(row=self.row, column=self.column)
         label.grid(row=self.row + 1, column=self.column)
@@ -225,10 +269,10 @@ class DetectedUser:
 
     def on_start_hover(self, _, user_id_temp, button_temp, label_temp):
         button_temp.configure(bg="pink")
-        print(user_id_temp)
-        label_temp.configure(text="SHOW DETAIL INFORMATION\nabout home and life")
+        information_of_employee = self.list_employee.get_infor_employee(user_id_temp)
+        label_temp.configure(text=information_of_employee)
 
-    def on_end_hover(self, _, user_id_temp, button_temp, label_temp):
+    def on_end_hover(self, _, employee_name_temp, button_temp, label_temp):
         if self.list_buttons:
             button_temp.configure(bg="#faf3e0")
-            label_temp.configure(text=user_id_temp)
+            label_temp.configure(text=employee_name_temp)

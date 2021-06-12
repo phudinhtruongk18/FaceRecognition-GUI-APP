@@ -3,9 +3,11 @@ import cv2
 from threading import Thread
 import numpy as np
 
-from Model.ClassForSoftware import ListEmployee
+from Model.ClassForSoftware import ListEmployee, Employee
 
 # COLOR OF TEXT OF RECTANGLE AROUND FACE
+from Model.data_manager import DataManager
+
 COLOR_FACE = (250, 128, 114)
 COLOR_FACE_DETECT = (0, 255, 0)
 COLOR_FACE_COMPLETE = (255, 255, 0)
@@ -16,9 +18,10 @@ SECOND_DIFF = 50
 
 
 class Detector(Thread):
-    def __init__(self, selected_employee, menu_UI):
+    def __init__(self, ID_RECORDER, selected_employee, menu_UI):
         # List users
         super().__init__()
+        self.ID_RECORDER = ID_RECORDER
         self.progress = 1
         self.menu_UI = menu_UI
         self.list_users = ListEmployee(selected_employee)
@@ -38,6 +41,7 @@ class Detector(Thread):
 
     def thread_recog(self, index_perdict, numpy_confidence_temp):
         # compute the distance between the two histograms
+        # try:
         for indexFace, gray_face in enumerate(self.gray_face_list):
             # so if the  The algorithm should also return the calculated distance,
             #   which can be used as a ‘confidence’ measurement.
@@ -53,6 +57,7 @@ class Detector(Thread):
             # diff is distance distance between the Feature extracted and the pic histogram
             numpy_confidence_temp[indexFace][index_perdict] = int(diff)
             # use numpy to pack our value where index is the same with self.list user
+        # except Exception as e
 
     def detected_user(self, index_min, x, y, w, h):
         user_name = self.list_users[index_min].name
@@ -64,6 +69,9 @@ class Detector(Thread):
                                  COLOR_FACE_COMPLETE, 2, cv2.LINE_AA)
         # get name of customer and write on the frame
         cv2.imwrite("View/Detected/" + user_id + ".jpg", self.frame)
+        # working with database in table DETAIL_RECORD to insert this employee to database
+        with DataManager('Model/data/database/database.db') as db:
+            db.insert_new_record(IS_BACKUP=False, ID_EMPLOYEE=user_id, ID_RECORDER=self.ID_RECORDER)
         # add a new UI button right here
         self.menu_UI.add_detected_user(user_id)
         # save that frame to show later
@@ -72,36 +80,48 @@ class Detector(Thread):
         # pop that user out so the program will be smoother
         self.menu_UI.update_detected_text(num_of_list=self.num_of_user, num_of_left=len(self.recognizer))
 
-    def backup_detected_user_with_index(self, index_input):
-        user_id = self.list_users[index_input].name
+    def backup_detected_user_with_id(self, id_to_backup):
+        index_input = self.list_users.find_index_by_id(id_to_backup)
+
+        user_id = self.list_users[index_input].ID
+        user_name = self.list_users[index_input].name
         self.frame = cv2.putText(self.frame, str(datetime.now().time())[0:5], (50, 50), self.font, 2,
                                  COLOR_FACE_COMPLETE, 2, cv2.LINE_AA)
-        self.frame = cv2.putText(self.frame, user_id, (50, 100), self.font, 2,
+        self.frame = cv2.putText(self.frame, user_name, (50, 100), self.font, 2,
                                  COLOR_FACE_COMPLETE, 2, cv2.LINE_AA)
 
         # get name of customer and write on the frame
-        cv2.imwrite("View/Detected/index" + user_id + ".jpg", self.frame) # delete this line
+        cv2.imwrite("View/Backup/" + user_id + ".jpg", self.frame)  # delete this line
+        # working in database to backup in table DETAIL_RECORD to insert this employee to database
+        with DataManager('Model/data/database/database.db') as db:
+            db.insert_new_record(IS_BACKUP=False, ID_EMPLOYEE=user_id, ID_RECORDER=self.ID_RECORDER)
         # add a new UI button right here
-        self.menu_UI.add_detected_user("index"+user_id)
+        self.menu_UI.add_detected_user_backup(user_id)
         # save that frame to show later
         self.list_users.pop(index_input)
         self.recognizer.pop(index_input)
         # pop that user out so the program will be smoother
         self.menu_UI.update_detected_text(num_of_list=self.num_of_user, num_of_left=len(self.recognizer))
 
-    def backup_detected_user_with_id(self, id_backup):
-        self.frame = cv2.putText(self.frame, str(datetime.now().time()), (50, 50), self.font, 1, COLOR_FACE_COMPLETE,
-                                 1, cv2.LINE_AA)
-        self.frame = cv2.putText(self.frame, id_backup + " Detect complete !", (50, 100), self.font, 1,
-                                 COLOR_FACE_COMPLETE, 1, cv2.LINE_AA)
+    def backup_detected_user_with_id_but_detected_before(self, id_backup, detected_times):
+        with DataManager('Model/data/database/database.db') as db:
+            user = db.get_employee_infor_by_id(id_backup)
+        temp_user = Employee(*user)
+        self.frame = cv2.putText(self.frame, str(datetime.now().time())[0:5], (50, 50), self.font, 2,
+                                 COLOR_FACE_COMPLETE, 2, cv2.LINE_AA)
+        self.frame = cv2.putText(self.frame, temp_user.name, (50, 100), self.font, 2,
+                                 COLOR_FACE_COMPLETE, 2, cv2.LINE_AA)
+
         # get name of customer and write on the frame
-        cv2.imwrite("View/Detected/ID" + id_backup + ".jpg", self.frame) # delete this later
+        cv2.imwrite("View/Backup/" + temp_user.ID + "-times-" + str(detected_times) + ".jpg", self.frame)
+        # work with database
+        with DataManager('Model/data/database/database.db') as db:
+            if db.insert_new_record(IS_BACKUP=False, ID_EMPLOYEE=id_backup, ID_RECORDER=self.ID_RECORDER):
+                print("Success when create new DETAIL record ", self.ID_RECORDER, id_backup)
+            else:
+                print("Some thing Wrong when create DETAIL record ")
         # add a new UI button right here
-        self.menu_UI.add_detected_user("ID"+id_backup)
-
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!
-        # do some method to work with data later on in this case
-
+        self.menu_UI.add_detected_user_backup(temp_user.ID)
         # save that frame to show later
         self.menu_UI.update_detected_text(num_of_list=self.num_of_user, num_of_left=len(self.recognizer))
 
@@ -148,8 +168,10 @@ class Detector(Thread):
     def add_backup_user(self, id_to_add):
         self.list_users.add_backup_user(id_to_add)
 
-    def find_index_of_users(self, id_to_check):
-        return self.list_users.find_index_by_id(id_to_check=id_to_check)
+    def find_state_of_users(self, id_to_check):
+        with DataManager('Model/data/database/database.db') as db:
+            times = db.get_state_of_employee(ID_RECORDER=self.ID_RECORDER, ID_EMPLOYEE=id_to_check)
+        return times
 
     def main_app(self):
         self.read_necessary_classifiers()
@@ -158,7 +180,7 @@ class Detector(Thread):
         # show num of employee on the screen
         self.menu_UI.update_detected_text(num_of_list=self.num_of_user, num_of_left=len(self.recognizer))
         # use this line of code for detect from video
-        cap = cv2.VideoCapture("Model/data/video/dilam2.mp4")
+        cap = cv2.VideoCapture("Model/data/video/dilam4.mp4")
         # cv2.CAP_DSHOW for releasing the handle to the webcam to stop warning when close
         # cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         while not self.is_out_of_time:
@@ -166,7 +188,6 @@ class Detector(Thread):
             # list that have confidence of all user
             # READ FRAME
             ret, self.frame = cap.read()
-
             # ROTATE FRAME 90 CLOCKWISE
             # self.frame = cv2.rotate(self.frame, cv2.ROTATE_90_CLOCKWISE)
 
@@ -200,8 +221,8 @@ class Detector(Thread):
 
                 for index_face, (x, y, w, h) in enumerate(faces):
                     # get min user face to start recognize
-                    print(faces)
-                    print(np_confidence)
+                    # print(faces)
+                    # print(np_confidence)
                     min_diff = np_confidence[index_face].min()
                     index_min = np_confidence[index_face].argmin()
 
@@ -211,7 +232,7 @@ class Detector(Thread):
                     colorRectangle = COLOR_FACE
                     # -> upper confidence to minimum but still got the user name
                     # turn it between 10 and 45 based on situation
-                    print(min_diff)
+                    print("min diff ", min_diff)
                     # if this user pass this SECOND_DIFF so plus this user some point
                     if min_diff < SECOND_DIFF:
                         self.list_users[index_min].detect_user()
@@ -228,7 +249,7 @@ class Detector(Thread):
                             if self.list_users[index_min].counter > 100:
                                 # if detect more than 100 point frame then pop that user out and save the frame
                                 self.detected_user(index_min, x, y, w, h)
-                    print(np_confidence)
+                    # print(np_confidence)
                     self.frame = cv2.rectangle(self.frame, (x, y), (x + w, y + h), colorRectangle, 2)
                     self.frame = cv2.putText(self.frame, text, (x, y - 4), self.font, 1, colorRectangle, 1, cv2.LINE_AA)
 
