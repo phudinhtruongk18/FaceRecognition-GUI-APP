@@ -212,6 +212,18 @@ class DataManager:
         len_of_list = result.__len__()
         return len_of_list
 
+    def get_list_to_export(self, ID_RECORDER):
+        sql = f"""
+                SELECT A.ID,A.NAME,A.UNIT,B.ARRIVED_TIME, B.IS_BACKUP
+                FROM DETAIL_RECORD AS B,EMPLOYEE AS A
+                WHERE 
+                A.ID = B.ID_EMPLOYEE AND 
+                B.ID_RECORDER = ?
+                ORDER BY B.ARRIVED_TIME;
+                """
+        result = self.query(sql, (ID_RECORDER, ))
+        return result
+
     def update_employee_infor_by_id(self, ID_EMPLOYEE, **kwargs):
         change_employee = self.get_employee_infor_by_id(ID_EMPLOYEE)
         if not change_employee:

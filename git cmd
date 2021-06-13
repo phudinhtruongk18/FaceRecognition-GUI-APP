@@ -1,4 +1,10 @@
 git add *
+git rm -r --cached *__pycache__*
+
+git rm -r --cached ./Model/make_and_send/token_api.txt
+git rm -r --cached ./Model/make_and_send/secret_infor.xlsx
+
+git rm -r --cached ./Model/data/database/*
 git rm -r --cached ./Model/data/classifiers/*
 git rm -r --cached ./Model/data/NotEnoughData/*
 git rm -r --cached ./Model/data/NotForNow/*
@@ -6,9 +12,16 @@ git rm -r --cached ./Model/data/users_photos/*
 git rm -r --cached ./Model/data/video/*
 git rm -r --cached ./Model/data/WrongData/*
 
+git rm -r --cached ./View/Detected/*
+git rm -r --cached ./View/Backup/*
+
 git rm -r --cached ./.idea/
 
-git commit -m "working with detector in database"
+git add ./Model/data/database/database.db
+git add ./View/Detected/ARAM017.jpg
+git add ./View/Backup/ARAM017-times-1.jpg
+
+git commit -m "export file and send to manager to telegram and gmail"
 
 git push
 

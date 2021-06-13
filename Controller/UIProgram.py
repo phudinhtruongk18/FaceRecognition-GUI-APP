@@ -73,7 +73,7 @@ class StartPage(tk.Frame):
         button1 = tk.Button(label1, text="   Add a user  ", fg="#ffffff", bg="#263942",
                             command=lambda: self.controller.show_frame("PageOne"))
 
-        button2 = tk.Button(label1, text="   Change information  ", fg="#ffffff", bg="#263942",
+        button2 = tk.Button(label1, text="   Change Infor  ", fg="#ffffff", bg="#263942",
                             command=lambda: self.controller.show_frame("PageTwo"))
         button3 = tk.Button(self, text="  Retrain dataset ", fg="#ffffff", bg="#263942", command=self.train_data)
         button4 = tk.Button(self, text="   Select Session  ", fg="#ffffff", bg="#263942", command=self.select_session)
