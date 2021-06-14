@@ -22,9 +22,9 @@ Web Front-End Designer: [Pham Thanh Long]()<br>
   - Record the employee 
   - Update recorders in Database
   - Backup attendance
-  - Collect and save Recorders after every session in Excel format <b>(on testing)</b>
-  - Mail to manager to after every session in Excel format <b>(on plan)</b>
-  - Collect and Show recorders by month in Excel format <b>(on plan)</b>
+  - Collect and save Recorders after every session in Excel format
+  - Mail to manager to after every session in Excel format
+  - Collect and Show recorders by month in Excel format 
 # Support Web Version  
   - Select the Employee and time for Attendance Session(Not yet)
   - Load Saved Attendance Session (only UI)
@@ -47,7 +47,7 @@ $ python main.py
 
 ### Home Page
 
-![homepage](https://i.ibb.co/G9d7CWL/Picture1.png)
+![homepage](https://i.ibb.co/Ct8YrSG/menu.png)
 
 ### Select your session
 
@@ -55,6 +55,6 @@ $ python main.py
 
 ### Result
 
-![select](https://i.ibb.co/hLQfCY2/Picture5.png)
+![Result1](https://i.ibb.co/hLQfCY2/Picture5.png)
 
->>>**Free Software, Hell Yeah!**
+>**Free Software, Hell Yeah!**

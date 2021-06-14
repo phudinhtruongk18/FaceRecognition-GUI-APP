@@ -21,7 +21,8 @@ git add ./Model/data/database/database.db
 git add ./View/Detected/ARAM017.jpg
 git add ./View/Backup/ARAM017-times-1.jpg
 
-git commit -m "export file and send to manager to telegram and gmail"
+git commit -m "Done plan A!"
+
 
 git push
 

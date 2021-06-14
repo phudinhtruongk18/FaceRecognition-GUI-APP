@@ -172,13 +172,55 @@
 #      print(temp)
 #
 #
-def testFunc( **kwargs ):
-    attribute = kwargs.pop('ID', "id CUA NHAN VIEN MOI LAM RA")
-    print(attribute)
+# def testFunc( **kwargs ):
+#     attribute = kwargs.pop('ID', "id CUA NHAN VIEN MOI LAM RA")
+#     print(attribute)
+#
+#
+# testFunc( ID='new_value1', option3='new_value3' )
+# # {'option2': 'default_value2', 'option3': 'new_value3', 'option1': 'new_value1'}
+#
+# testFunc( option2='new_value2' )
+# # {'option1': 'default_value1', 'option3': 'default_value3', 'option2': 'new_value2'}
+
+def get_calen():
+    print(cal.get()<cal2.get())
+    print(cal.get())
+    print(cal2.get())
+
+import tkinter
+
+import tkcalendar
+from tkinter import *
+
+from tkcalendar import DateEntry
 
 
-testFunc( ID='new_value1', option3='new_value3' )
-# {'option2': 'default_value2', 'option3': 'new_value3', 'option1': 'new_value1'}
+root = Tk()
 
-testFunc( option2='new_value2' )
-# {'option1': 'default_value1', 'option3': 'default_value3', 'option2': 'new_value2'}
+label = Label(root,width=30,text="Get 1")
+label2 = Label(root,width=30,text="Get 2")
+cal = DateEntry(root,width=30,bg="darkblue",fg="white",year=2021,month=6, date_pattern='y-mm-dd')
+cal2 = DateEntry(root,width=30,bg="darkblue",fg="white",year=2021,month=6, date_pattern='y-mm-dd')
+btn = Button(root,width=30,text="Get",command=get_calen)
+label.grid()
+cal.grid()
+label2.grid()
+cal2.grid()
+btn.grid()
+
+root.mainloop()# import os
+
+#
+#
+# def taoThuMucTheoThoiGian(folder_name):
+#     if os.path.isfile(folder_name):
+#         os.mkdir(folder_name)
+#         return False
+#     return True
+#
+# isExist = taoThuMucTheoThoiGian(ID_Recorder)
+# if isExist:
+#     print("Exist So do nothing")
+# else:
+#     print("Create")

@@ -9,3 +9,4 @@ tkinter==8.6
 
 python-telegram-bot-13.6==13.6
 openpyxl~=3.0.7
+tkcalendar~=1.6.1

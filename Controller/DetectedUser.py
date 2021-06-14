@@ -94,7 +94,7 @@ class DetectedUser:
         id_to_backup = str(id_to_backup)
         isRecorded, detected_times = self.menuUI.detected_user_from_detector(id_to_backup)
         if isRecorded is None:
-            messagebox.showinfo(" Try Again!", "Your ID" + id_to_backup + " doesn't exist!")
+            messagebox.showinfo(" Try Again!", "Your ID " + id_to_backup + " doesn't exist!")
         else:
             self.menuUI.backup_detected_user_with_id_to_detector(id_to_backup=id_to_backup,
                                                                  detected_times=detected_times)
@@ -150,10 +150,11 @@ class DetectedUser:
     def stop_detect(self):
         # stop detecting in Detector
         self.menuUI.stop_detect()
-        # hide this window
-        self.master.withdraw()
-        # reset for new session
-        self.reset_data()
+        # # hide this window
+        # self.master.withdraw()
+        # # reset for new session
+        # self.reset_data()
+        self.master.destroy()
         # show up menuUI
         self.menuUI.controller.deiconify()
 
@@ -185,7 +186,6 @@ class DetectedUser:
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
 
     def on_mouse_scroll(self, event):
-        print(event)
         self.canvas.yview_scroll(-1 * int((event.delta / 150)), "units")
 
     def get_right_size(self, wi, he):
@@ -196,14 +196,12 @@ class DetectedUser:
             wi, he = self.button_size, self.button_size * ratio
         return int(wi), int(he)
 
-    def add_detected_user_backup(self, user_id):
+    def add_detected_user_backup(self, user_id, detected_time):
         # sub 1 because after check and add to database detected_times is counting itself
-        detected_times = self.menuUI.find_state_of_users_by_id(user_id) - 1
+        # detected_times = self.menuUI.find_state_of_users_by_id(user_id) - 1
+
         # get employee photo
-        if detected_times > 0:
-            link_user = "View/Backup/" + user_id + "-times-" + str(detected_times) + ".jpg"
-        else:
-            link_user = "View/Backup/" + user_id + ".jpg"
+        link_user = "View/Backup/" + detected_time + ".jpg"
 
         user_pic = Image.open(link_user)
 
@@ -237,9 +235,9 @@ class DetectedUser:
         self.list_buttons.append(button)
         self.list_labels.append(label)
 
-    def add_detected_user(self, user_id):
+    def add_detected_user(self, user_id, detected_time):
         # get employee photo
-        link_user = "View/Detected/" + user_id + ".jpg"
+        link_user = "View/Detected/" + detected_time + ".jpg"
         user_pic = Image.open(link_user)
         employee_name = self.list_employee.get_name_employee(user_id)
         # get right size of user picture and resize to make it good looking and fit to the button

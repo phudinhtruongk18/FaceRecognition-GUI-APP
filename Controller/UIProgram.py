@@ -1,5 +1,8 @@
+import os
+
 from Controller.DetectedUser import DetectedUser
 from Model.ClassForSoftware import Employee
+from Model.make_and_send.excel_maker import create_excel_by_time
 from View.Detector import Detector
 from Model.train_all_classifiers import train_all_classifers
 from Model.create_one_new_classifier import train_one_classifer
@@ -9,6 +12,7 @@ from tkinter import font as tkfont, ttk
 from tkinter import messagebox, PhotoImage
 from Controller.SelectSession import SelectSession
 from Model.data_manager import DataManager
+from tkcalendar import DateEntry
 
 
 class MainUI(tk.Tk):
@@ -20,8 +24,8 @@ class MainUI(tk.Tk):
         self.resizable(False, False)
         ws = self.winfo_screenwidth()
         hs = self.winfo_screenheight()
-        x, y = ws / 2 - 510 / 2, hs / 2 - 350
-        self.geometry('%dx%d+%d+%d' % (510, 350, x, y))
+        x, y = ws / 2 - 610 / 2, hs / 2 - 370
+        self.geometry('%dx%d+%d+%d' % (610, 370, x, y))
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.active_employee = None
 
@@ -61,8 +65,11 @@ class StartPage(tk.Frame):
         render = PhotoImage(file='View/Stock/homepagepic.png')
         img = tk.Label(self, image=render)
         img.image = render
-        img.grid(row=0, column=1, rowspan=5, sticky="nsew")
+        img.grid(row=0, column=1, rowspan=5, ipadx=50, sticky="nsew")
         self.progress_bar = ttk.Progressbar(self, orient=tk.HORIZONTAL, length=100, mode="determinate")
+        about = tk.Button(self, width=20, text="    About    ", fg="#ffffff", bg="#263942", command=self.show_about)
+        tk.Label(self).grid(row=6, column=1, ipady=2, ipadx=2)
+        about.grid(row=7, column=1, ipady=6, ipadx=6)
         label = tk.Label(self, text="     Face Attendance     \n    Recorder System    ",
                          font=tkfont.Font(family='Helvetica', size=16, weight="bold"), fg="#263942")
         label.grid(row=0, sticky="ew")
@@ -78,7 +85,8 @@ class StartPage(tk.Frame):
         button3 = tk.Button(self, text="  Retrain dataset ", fg="#ffffff", bg="#263942", command=self.train_data)
         button4 = tk.Button(self, text="   Select Session  ", fg="#ffffff", bg="#263942", command=self.select_session)
         button5 = tk.Button(self, text="   Start Session  ", fg="#ffffff", bg="#263942", command=self.openwebcam)
-        button6 = tk.Button(self, text="    Quit    ", fg="#263942", bg="#ffffff", command=self.on_closing)
+        button6 = tk.Button(self, text="   Export Result  ", fg="#ffffff", bg="#263942", command=self.open_export_box)
+        button7 = tk.Button(self, text="    Quit    ", fg="#263942", bg="#ffffff", command=self.on_closing)
 
         button1.grid(row=1, column=0, ipady=3, ipadx=2)
         button2.grid(row=1, column=1, ipady=3, ipadx=2)
@@ -87,6 +95,76 @@ class StartPage(tk.Frame):
         button4.grid(row=3, column=0, ipady=4, ipadx=2)
         button5.grid(row=4, column=0, ipady=4, ipadx=2)
         button6.grid(row=5, column=0, ipady=4, ipadx=2)
+        tk.Label(self).grid(row=6, column=0, ipady=2, ipadx=2)
+        button7.grid(row=7, column=0, ipady=4, ipadx=5)
+
+    def export_data(self, cal1, cal2, export_box):
+        if cal1 >= cal2:
+            messagebox.showinfo("Wrong time", "Choose time again!")
+            return
+        filename = create_excel_by_time(cal1, cal2)
+        export_box.destroy()
+        self.controller.deiconify()
+        if messagebox.askokcancel("Export complete!", "Do you want to open " + filename + "!"):
+            self.open_fordel()
+
+    def open_fordel(self):
+        os.startfile(f'{os.path.realpath("View/Summary")}')
+
+    def open_export_box(self):
+        self.controller.withdraw()
+        export_box = tk.Toplevel(self.master)
+        export_box.title("Export Data Box")
+        ws = self.master.winfo_screenwidth()
+        hs = self.master.winfo_screenheight()
+        w = 305
+        h = 200
+        x, y = ws / 2 - w / 2, hs / 2 - h - 80
+        export_box.geometry('%dx%d+%d+%d' % (w, h, x, y))
+        label = tk.Label(export_box, width=30, text="From")
+        label2 = tk.Label(export_box, width=30, text="To")
+        cal1 = DateEntry(export_box, width=10, bg="darkblue", fg="white", year=2021, month=6, day=12,
+                         date_pattern='y-mm-dd', font=('Helvetica', 18, "bold"))
+        cal2 = DateEntry(export_box, width=10, bg="darkblue", fg="white", year=2021, month=6, day=14,
+                         date_pattern='y-mm-dd', font=('Helvetica', 18, "bold"))
+        btn = tk.Button(export_box, width=10, text="Export", fg="#ffffff", bg="#263942", font=('Helvetica', 18, "bold"),
+                        command=lambda: self.export_data(cal1.get(), cal2.get(), export_box))
+        export_box.protocol("WM_DELETE_WINDOW", lambda: self.close_export(export_box))
+        label.pack()
+        cal1.pack()
+        label2.pack()
+        cal2.pack()
+        tk.Label(export_box).pack()
+        btn.pack()
+
+    def close_export(self, export_box):
+        export_box.destroy()
+        self.controller.deiconify()
+
+    def show_about(self):
+        about_box = tk.Toplevel(self.master)
+        about_box.title("About")
+        ws = self.master.winfo_screenwidth()
+        hs = self.master.winfo_screenheight()
+        w = 605
+        h = 300
+        x, y = ws / 2 - w / 2, hs / 2 - h
+        about_box.geometry('%dx%d+%d+%d' % (w, h, x, y))
+        label = tk.Label(about_box, width=60, text="""
+Original FaceRecognition-GUI-APP by JoeVenner
+Thank JoeVenner for allowing me to develop this awesome project
+
+SIMPLE FACE ATTENDANCE RECORDER SYSTEM
+Instructor: MSIT Vũ Đình Long
+Main develop and design: Phu Dinh Truong - phudinhtruongk18@gmail.com
+Special thank to for great support: Pham Van Luong with Sang Nguyen
+Web Front-End Designer: Pham Thanh Long
+            """, font=('Helvetica', 12, "bold"))
+        btn = tk.Button(about_box, width=10, text="Close", fg="#ffffff", bg="#263942", font=('Helvetica', 13, "bold"),
+                        command=about_box.destroy)
+        label.pack()
+        tk.Label(about_box).pack()
+        btn.pack()
 
     def get_select_list(self, selected_session):
         self.current_session = selected_session
@@ -140,7 +218,7 @@ class StartPage(tk.Frame):
     def backup_detected_user_with_id_to_detector(self, id_to_backup, detected_times):
         # call dec to work with sql
         if detected_times > 0:
-            self.dec.backup_detected_user_with_id_but_detected_before(id_to_backup, detected_times)
+            self.dec.backup_detected_user_with_id_but_detected_before(id_to_backup)
         else:
             self.dec.backup_detected_user_with_id(id_to_backup)
 
@@ -180,11 +258,11 @@ class StartPage(tk.Frame):
     def update_detected_text(self, num_of_list, num_of_left):
         self.DetectedWindow.update_detected_text(num_of_list=num_of_list, num_of_left=num_of_left)
 
-    def add_detected_user(self, user_id):
-        self.DetectedWindow.add_detected_user(user_id)
+    def add_detected_user(self, user_id, detected_time):
+        self.DetectedWindow.add_detected_user(user_id, detected_time)
 
-    def add_detected_user_backup(self, user_id):
-        self.DetectedWindow.add_detected_user_backup(user_id)
+    def add_detected_user_backup(self, user_id, detected_time):
+        self.DetectedWindow.add_detected_user_backup(user_id, detected_time)
 
     def update_frame(self, frame):
         self.DetectedWindow.update_image(frame)
@@ -222,7 +300,6 @@ class PageOne(tk.Frame):
     def start_training(self):
         with DataManager('Model/data/database/database.db') as db:
             ALL_ID = db.get_all_user_ID()
-        print(ALL_ID)
         if self.employee_ID.get() == "None":
             messagebox.showerror("Error", "Name cannot be 'None'")
             return

@@ -145,15 +145,16 @@ class DataManager:
     def insert_new_record(self, IS_BACKUP, ID_EMPLOYEE, ID_RECORDER):
         try:
             ARRIVED_TIME = datetime.now().strftime('%H:%M:%S')
+            ARRIVED_TIME_RETURN = datetime.now().strftime('%Hh%Mm%S')
 
             self.execute("INSERT INTO DETAIL_RECORD (ARRIVED_TIME,IS_BACKUP,ID_EMPLOYEE,ID_RECORDER) VALUES (?,?,?,?)",
                          (ARRIVED_TIME, int(IS_BACKUP), ID_EMPLOYEE, ID_RECORDER))
-            return True
+            return ARRIVED_TIME_RETURN
         except sqlite3.IntegrityError:
             print("IntegrityError")
         except Exception as e:
             print(e)
-        return False
+        return None
 
     def get_all_recorder(self):
         sql = "SELECT ID FROM RECORDER;"
@@ -221,7 +222,7 @@ class DataManager:
                 B.ID_RECORDER = ?
                 ORDER BY B.ARRIVED_TIME;
                 """
-        result = self.query(sql, (ID_RECORDER, ))
+        result = self.query(sql, (ID_RECORDER,))
         return result
 
     def update_employee_infor_by_id(self, ID_EMPLOYEE, **kwargs):
@@ -244,52 +245,113 @@ class DataManager:
             print(e)
         return False
 
+    def get_employee_to_export_by_time(self, TIMEBEGIN, TIMEEND):
+        sql = f"""
+            SELECT A.ID,A.NAME,A.UNIT,ALL_SESSION_TO_GO.ALL_SESSION , IFNULL(OFF.NOT_GO_TO_WORK,0) AS "OFF_WORK", ALL_SESSION_TO_GO.ALL_SESSION - IFNULL(OFF.NOT_GO_TO_WORK,0) AS "GO_TO_WORK"
+            FROM 			
+                EMPLOYEE AS A,
+                (		
+            
+                        SELECT LIST_RECORD.ID_EMPLOYEE,count(LIST_RECORD.ID) AS "ALL_SESSION"
+                        FROM (
+                            SELECT B.*,A.ID_EMPLOYEE, A.ID_SESSION AS "confirm" FROM 
+                            RECORDER AS B, SAVED_SESSION AS A
+                        WHERE B.ID IN (SELECT RECORDER.ID FROM RECORDER WHERE RECORDER.ID BETWEEN ? AND ?)
+                            AND B.ID_SESSION = A.ID_SESSION
+                        ) AS LIST_RECORD
+                        GROUP BY 
+                            LIST_RECORD.ID_EMPLOYEE
+                
+                ) AS ALL_SESSION_TO_GO
+            
+            LEFT JOIN
+                        (
+                        
+                        SELECT EXPORT.ID_EMPLOYEE, COUNT(*) AS "NOT_GO_TO_WORK"
+                        FROM
+                        (SELECT B.*,A.ID_EMPLOYEE FROM 
+                            RECORDER AS B, SAVED_SESSION AS A
+                        WHERE B.ID IN (SELECT RECORDER.ID FROM RECORDER WHERE RECORDER.ID BETWEEN ? AND ?)
+                            AND B.ID_SESSION = A.ID_SESSION ) AS EXPORT
+                        LEFT JOIN 
+                        DETAIL_RECORD AS B
+                            ON B.ID_RECORDER=EXPORT.ID
+                            AND B.ID_EMPLOYEE = EXPORT.ID_EMPLOYEE
+                        WHERE B.IS_BACKUP IS NULL
+                        GROUP BY EXPORT.ID_EMPLOYEE
+            
+                    )AS OFF
+            
+            ON ALL_SESSION_TO_GO.ID_EMPLOYEE = OFF.ID_EMPLOYEE
+            WHERE ALL_SESSION_TO_GO.ID_EMPLOYEE = A.ID                
+            """
+        result = self.query(sql, (TIMEBEGIN, TIMEEND, TIMEBEGIN, TIMEEND))
+        return result
+
+    def get_employee_did_not_go_to_work(self, ID_RECORDER):
+        sql = f"""
+    SELECT ALL_EMPLOYEE.* FROM 
+        (SELECT D.ID,D.NAME,UNIT
+        FROM RECORDER AS C,SAVED_SESSION AS A, EMPLOYEE AS D
+        WHERE 
+        C.ID = "2021-06-12 23:11:08"
+        AND D.ID = A.ID_EMPLOYEE
+        AND A.ID_SESSION = C.ID_SESSION) AS ALL_EMPLOYEE
+    WHERE ALL_EMPLOYEE.ID NOT IN 
+            (SELECT B.ID_EMPLOYEE 
+            FROM DETAIL_RECORD AS B 
+            WHERE B.ID_RECORDER = ?)
+    ORDER BY ALL_EMPLOYEE.ID;
+            """
+        result = self.query(sql, (ID_RECORDER,))
+        return result
+
 # with Database('Model/data/database/database.db') as db:
-    # print(db.get_all_user_name())
+# print(db.get_all_user_name())
 
-    # print(db.get_load_infor())
+# print(db.get_load_infor())
 
-    # if db.insert_employee(UserDetector('TEST002', 'Phu Dinh', 'MALE', 28, 'FREELANCER')):
-    #     print("Done")
-    # else:
-    #     print("Can't add this employee! Try Again")
+# if db.insert_employee(UserDetector('TEST002', 'Phu Dinh', 'MALE', 28, 'FREELANCER')):
+#     print("Done")
+# else:
+#     print("Can't add this employee! Try Again")
 
-    # if db.insert_session(Session("TEST002","TEST NEK BN ƠI",69)):
-    #     print("Done")
-    # else:
-    #     print("Can't add this employee! Try Again")
+# if db.insert_session(Session("TEST002","TEST NEK BN ƠI",69)):
+#     print("Done")
+# else:
+#     print("Can't add this employee! Try Again")
 
-    # # RECORDER
-    # ID_SESSION = "TEST_SESSION_001"
-    # ID_RECORDER = db.insert_and_get_id_recorder(ID_SESSION)
-    # if result is not None:
-    #     print(ID_RECORDER)
-    #     print("Success")
-    # else:
-    #     print("Some thing Wrong when create new recorder")
+# # RECORDER
+# ID_SESSION = "TEST_SESSION_001"
+# ID_RECORDER = db.insert_and_get_id_recorder(ID_SESSION)
+# if result is not None:
+#     print(ID_RECORDER)
+#     print("Success")
+# else:
+#     print("Some thing Wrong when create new recorder")
 
-    # ADD NEW RECORD
-    # IS_BACKUP = True
-    # ID_EMPLOYEE = "ARAM001"
-    # ID_RECORDER = "THANKLONG001"
-    # if db.insert_new_record(IS_BACKUP, ID_EMPLOYEE, ID_RECORDER):
-    #     print(ID_RECORDER)
-    #     print("Success")
-    # else:
-    #     print("Some thing Wrong when create new recorder")
+# ADD NEW RECORD
+# IS_BACKUP = True
+# ID_EMPLOYEE = "ARAM001"
+# ID_RECORDER = "THANKLONG001"
+# if db.insert_new_record(IS_BACKUP, ID_EMPLOYEE, ID_RECORDER):
+#     print(ID_RECORDER)
+#     print("Success")
+# else:
+#     print("Some thing Wrong when create new recorder")
 
-    # print(db.get_all_recorder())
-    # my_recorder = db.get_recorder_by_time(begin_time="2019-02-20",end_time="2022-02-28")
-    # for temp2 in db.get_all_detail_record_by_recorder_id(my_recorder[0]):
-    #     thanklong = RecordDetail(temp2[0], temp2[1], temp2[2], temp2[3], temp2[4])
-    #     print(thanklong.id_recorder)
+# print(db.get_all_recorder())
+# my_recorder = db.get_recorder_by_time(begin_time="2019-02-20",end_time="2022-02-28")
+# for temp2 in db.get_all_detail_record_by_recorder_id(my_recorder[0]):
+#     thanklong = RecordDetail(temp2[0], temp2[1], temp2[2], temp2[3], temp2[4])
+#     print(thanklong.id_recorder)
 
-    # delete
-    # db.insert_employee(UserDetector('TEST002', 'Phu Dinh', 'MALE', 28, 'FREELANCER'))
-    # if db.delete_employee_by_id('TEST002'):
-    #     print("Success")
-    # else:
-    #     print("Something went wrong! Try again")
+# delete
+# db.insert_employee(UserDetector('TEST002', 'Phu Dinh', 'MALE', 28, 'FREELANCER'))
+# if db.delete_employee_by_id('TEST002'):
+#     print("Success")
+# else:
+#     print("Something went wrong! Try again")
 
-    # db.update_employee_infor_by_id(ID_EMPLOYEE="ARAM017",NAME="Phu Dinh",AGE=21,UNIT="FREELANCER")
-    # print(db.get_employee_infor_by_id("ARAM017"))
+# db.update_employee_infor_by_id(ID_EMPLOYEE="ARAM017",NAME="Phu Dinh",AGE=21,UNIT="FREELANCER")
+# print(db.get_employee_infor_by_id("ARAM017"))

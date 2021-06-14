@@ -4,7 +4,7 @@ url = 'https://api.fpt.ai/hmi/tts/v5'
 
 payload = 'Phú đã điểm danh thành công'
 headers = {
-    'make_and_send-key': 'ojp4yPxFFpuNozefkke0ZrSQt5SXR55W',
+    'api-key': 'ojp4yPxFFpuNozefkke0ZrSQt5SXR55W',
     'speed': '',
     'voice': 'banmai'
 }
