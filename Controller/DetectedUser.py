@@ -127,7 +127,7 @@ class DetectedUser:
         # simple time counter update after every second
         now = time.perf_counter()
         time_left = int(self.timer_second - (now - self.timeBegin))
-        self.time_left.configure(text=time_left)
+        self.time_left.configure(text=str(time_left)+" seconds")
         self.master.after(1000, self.update_clock)
         if time_left < 0:
             self.stop_detect()

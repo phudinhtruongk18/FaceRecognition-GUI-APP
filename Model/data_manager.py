@@ -294,7 +294,7 @@ class DataManager:
         (SELECT D.ID,D.NAME,UNIT
         FROM RECORDER AS C,SAVED_SESSION AS A, EMPLOYEE AS D
         WHERE 
-        C.ID = "2021-06-12 23:11:08"
+        C.ID = ?
         AND D.ID = A.ID_EMPLOYEE
         AND A.ID_SESSION = C.ID_SESSION) AS ALL_EMPLOYEE
     WHERE ALL_EMPLOYEE.ID NOT IN 
@@ -303,7 +303,7 @@ class DataManager:
             WHERE B.ID_RECORDER = ?)
     ORDER BY ALL_EMPLOYEE.ID;
             """
-        result = self.query(sql, (ID_RECORDER,))
+        result = self.query(sql, (ID_RECORDER,ID_RECORDER))
         return result
 
 # with Database('Model/data/database/database.db') as db:

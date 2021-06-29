@@ -436,6 +436,7 @@ class PageTwo(tk.Frame):
         self.note_label.configure(text="Update employee information")
         self.label_ID.grid(row=0, column=0)
         self.button_next.grid(row=0, ipadx=10, ipady=4, column=2, pady=10)
+        self.button_cancel.grid(row=6, column=0, pady=10, ipadx=5, ipady=4)
 
     def hide_things(self, employee):
         self.label_ID.grid_forget()

@@ -16,7 +16,8 @@ COLOR_FACE_COMPLETE = (255, 255, 0)
 
 # 2 POWERFUL NUM THAT DECIDE IS THAT OUR USER OR NOT
 FIRST_DIFF = 30
-SECOND_DIFF = 50
+# SECOND_DIFF = 50
+SECOND_DIFF = 60
 
 
 class Detector(Thread):
@@ -33,7 +34,10 @@ class Detector(Thread):
         self.num_of_user = 0
         self.frame = None
         self.font = cv2.FONT_HERSHEY_PLAIN
+        # use haarcascade_frontalface_default.xml
         self.face_cascade = cv2.CascadeClassifier('Model/data/haarcascade_frontalface_default.xml')
+        # use lbpcascade_frontalface.xml
+        # self.face_cascade = cv2.CascadeClassifier('Model/data/lbpcascade_frontalface.xml')
         self.gray_face_list = []
         self.is_out_of_time = False
 

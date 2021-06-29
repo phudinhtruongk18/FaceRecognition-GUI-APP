@@ -87,6 +87,8 @@ for i in range(0, height):
     for j in range(0, width):
         img_lbp[i, j] = lbp_calculated_pixel(img_gray, i, j)
 
+print(img_lbp)
+
 plt.imshow(img_bgr)
 plt.show()
 
@@ -94,3 +96,43 @@ plt.imshow(img_lbp, cmap="gray")
 plt.show()
 
 print("LBP Program is finished")
+
+def count_elements(seq) -> dict:
+    """Tally elements from `seq`."""
+    hist = {}
+    for i in seq:
+        hist[i] = hist.get(i, 0) + 1
+    return hist
+
+count_list = []
+for temp in img_lbp:
+    for temp2 in temp:
+        count_list.append(temp2)
+
+print(count_list)
+temp_bruh = count_elements(count_list)
+# sorted_items = sorted(bruh)
+bruh = dict(sorted(temp_bruh.items()))
+print(bruh)
+print(bruh.items())
+print(bruh.keys())
+print(bruh.values())
+
+
+
+def lambieudo(show_2):
+    from matplotlib import pyplot
+    pyplot.bar(show_2.keys(),show_2.values())
+    pyplot.xlabel("Gia Tri He 10")
+    pyplot.ylabel("So luong")
+    pyplot.savefig("rusult.png")
+    pyplot.show()
+
+lambieudo(bruh)
+
+from collections import OrderedDict
+import itertools
+
+ketqua = OrderedDict(sorted(bruh.items(), key=lambda t: t[1],reverse=True))
+print("Cac ket qua chiem so luong lon nhat !")
+print(ketqua)
