@@ -21,7 +21,7 @@ git add ./Model/data/database/database.db
 git add ./View/Detected/ARAM017.jpg
 git add ./View/Backup/ARAM017-times-1.jpg
 
-git commit -m "Done plan A!"
+git commit -m "Fix some bug!"
 
 
 git push
